@@ -1,0 +1,102 @@
+@import './base.css';
+
+.topMargin {
+    padding-top: 18%;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+}
+//login
+.loginWrap {
+    background-color: #fff;
+    padding: 0 1rem;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: relative;
+    height: 90%;
+    width: 100%;
+    .loginIn.loginCenter {
+        .loginLogo {
+            text-align: center;
+            height: 3.2rem;
+            img {
+                height: 100%;
+            }
+        }
+        .logoText {
+            font-size: .625rem;
+            text-align: center;
+            // font-family: serif;
+            font-weight: 800;
+            padding: 10px 0;
+        }
+        .bindthree {
+            margin-top: .266667rem;
+            text-align: center;
+            h3 {
+                font-size: 22px;
+            }
+            p {
+                color: #808080;
+            }
+        }
+        .loginIpt {
+            //login 组件
+            .am-list-item .am-input-label.am-input-label-5 {
+                font-size: 14px;
+                width: .666667rem;
+            }
+            .am-list-item .am-input-control input {
+                font-size: 14px;
+                position: relative;
+                top: .04rem;
+            }
+            .am-list-item.am-input-item {
+                height: .933333rem;
+                line-height: .533333rem;
+                margin: .4rem 0 0  0;
+                border-bottom: 1PX solid #CBCBCB;
+                position: relative;
+                padding-left: 0;
+            }
+            i {
+                font-size: 22px;
+                color: #F01925;
+                display: inline-block;
+                position: relative;
+                top: .04rem;
+            }
+            i.phone {
+                margin-left: .066667rem;
+            }
+            .am-input-error-extra {
+                width: .4rem;
+                height: .4rem;
+                background-size:.4rem .4rem;
+                background-repeat: no-repeat;
+            }
+        }
+        .am-list-body {
+            border: 0 none;
+            .am-list-item:not(:last-child) .am-list-line {
+                border: 0 none;
+            }
+        }
+        .am-button {
+            height: 1.3rem;
+            line-height: 1.3rem;
+            border-radius: .133333rem;
+            margin-top: .533333rem;
+            background-color: #F01925;
+            font-size: 18px;
+        }
+    }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
+    html:not([data-scale]) .loginCenter .am-list-body::before {
+        background-color: #fff;
+    }
+}

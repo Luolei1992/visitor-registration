@@ -16,6 +16,7 @@ Thumbs.db
 *.pyc
 *.pyo
 node_modules
+ziliao
 bower_components/
 npm-debug.log
 .module-cache

@@ -9,7 +9,7 @@ npm i  # npm i --save-dev webpack@2 webpack-dev-server@2 extract-text-webpack-pl
 npm start
 ```
 
-open http://localhost:8000/
+open http://localhost:5000/
 
 ### Build
 
