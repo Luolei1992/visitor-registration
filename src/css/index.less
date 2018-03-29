@@ -1,8 +1,8 @@
 @import './base.css';
 
 .topMargin {
-    padding-top: 18%;
-    position: fixed;
+    padding-top: 16%;
+    position: absolute;
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -94,7 +94,136 @@
         }
     }
 }
+//访客登记
+.am-navbar.pubHeadStyle {
+    height: 1.4rem;
+    width: 100%;
+    background-color: #000;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 999;
+    .am-navbar-left {
+        padding-left: 0;
+    }
+    p {
+        line-height: 1;
+        i {
+            line-height: 36px;
+            display: inline-block;
+            float: right;
+        }
+    }
+}
+.registerWrap {
+    position: absolute;
+    width: 100%;
+    min-height: 100%;
+    background-color: #F6F6F6;
+    .warring {
+        height: 1rem;
+        line-height: 1rem;
+        font-size: 15px;
+        padding-left: 10px;
+        color: #B6B6B6;
+    }
+}
+.centerWrap {
+    padding: 1.4rem 0 1.2rem 0;
+}
+.pubStyleList {
+    color:#7E7E7E;
+    .am-list-item.am-input-item {
+        padding-left: 0;
+        height: 1.2rem;
+        .am-list-line {
+            padding-left: 15px;
+        }
+    }
+    .am-list-item {
+        padding-left: 0;
+        .am-input-label {
+            color: #7E7E7E;
+            text-align:justify;
+            text-justify:distribute-all-lines; 
+            text-align-last:justify;
+            margin-right: 15px;
+            font-size: 15px;
+        }
+        
+        .am-input-label.am-input-label-5 {
+            width: 66px;
+        }
+        .am-input-control input {
+            line-height: 2;
+            color: #7E7E7E;
+            font-size: 15px;
+        }
+    } 
+    .datePickerWrap {
+        overflow: hidden;
+        height: 1.2rem;
+        border-bottom: 1px solid #EFEFEF;
+        box-sizing: border-box;
+        line-height: 1.2rem;
+        font-size: 15px;           
+        display: flex;
+        -webkit-box-flex: 1;
+        -webkit-flex: 1;
+        -ms-flex: 1;
+        flex: 1;
+        padding-left: 15px;        
+        .wrapTwoPicker {
+            -webkit-box-flex: 1;
+            -webkit-flex: 1;
+            -ms-flex: 1;
+            flex: 1; 
+            input {
+                border: 0 none;
+                width: 48%;
+                text-align: center;
+                line-height: 1.2rem; 
+                color: #7E7E7E;
+            }
+            i {
+                display: inline-block;
+                width: 8px;
+            }
+        }
+        .pickerLeft {
+            box-sizing: border-box; 
+            float: left;
+            width: 64px;
+            text-align: justify;
+            text-align-last: justify;
+            text-justify: distribute-all-lines;
+        }
+    }
+}
+.registerBtm {
+    height: 1.2rem;
+    background-color: #E60012;
+    text-align: center;
+    color: #fff;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 18px;
+    line-height: 1.2rem;
+    letter-spacing: 2px;
+}
+.line {
+    background-color: #EFEFEF;
+    height: 1px;
+    width: 100%;
+}
+.jianGe {
+    height: 12px;
+    width: 100%;
+    background-color: #F6F6F6;
+}
 
+//input组件样式更改
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
     html:not([data-scale]) .loginCenter .am-list-body::before {
         background-color: #fff;

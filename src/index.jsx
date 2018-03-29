@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
 
 import App from './components/App';
-import Login from './components/Login';
+import Index from './components/Login';
+import Register from './components/Register';
 
 
 import './css/font/iconfont.css'
@@ -14,8 +15,8 @@ import 'lib-flexible/flexible'
 ReactDOM.render(
     <Router history={hashHistory}>
         <Route path="/" component={App}>
-            {/* <IndexRoute component={Index} /> */}
+            <IndexRoute component={Index} />
+            <Route path="/register" component={Register} />
         </Route>
-        <Route path="/login" component={Login} />
     </Router>
     , document.getElementById('visitorWrap'));

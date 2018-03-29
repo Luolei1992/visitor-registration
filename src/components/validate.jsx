@@ -76,6 +76,7 @@ const getNowFormatDate=()=> {
     let currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
     return currentdate;
 }
+
 export default {
     CheckPhone, 
     CheckKeywords, 

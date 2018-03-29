@@ -108,7 +108,11 @@ export default class Login extends React.Component {
                         <div>
                             <Button type="warning"
                                 className="loginBtn"
-                                onClick={()=>{}}
+                                onClick={()=>{
+                                    hashHistory.push({
+                                        pathname: '/register'
+                                    });
+                                }}
                             >登 陆</Button>
                         </div>
                         {/* <ActivityIndicator
