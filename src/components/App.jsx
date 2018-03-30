@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
-import QueueAnim from 'rc-queue-anim';
-import { TabBar } from 'antd-mobile';
+import { hashHistory } from 'react-router';
 
 
 export default class App extends Component {
@@ -13,10 +11,9 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        if (validate.getCookie('user_id')) {
+        if (!validate.getCookie('user_id')) {
             hashHistory.push({
-                pathname: '/login',
-                query: { form: 'promise' }
+                pathname: '/login'
             });
         };
     }

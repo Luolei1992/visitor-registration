@@ -10,6 +10,18 @@ const CheckPhone = (value) => {
         hasError: false
     }
 }
+// 验证手机号
+const CheckIdCard = (value) => {
+    if (!/^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[A-Z])$/.test(value) && !/^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$/.test(value)) {
+        return {
+            hasError: true,
+            errorMessage: '请输入正确的身份证号'
+        }
+    }
+    return {
+        hasError: false
+    }
+}
 // 验证邮箱 
 const CheckEmail = (value) => {
     if (!/^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/.test(value)) {
@@ -34,6 +46,7 @@ const CheckKeywords = (value) => {
         hasError: false
     }
 }
+
 //短信验证码
 
 const getCookie = (name) => {
@@ -83,5 +96,6 @@ export default {
     getCookie, 
     setCookie,
     CheckEmail,
-    getNowFormatDate
+    getNowFormatDate,
+    CheckIdCard
 }

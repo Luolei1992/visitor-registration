@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { hashHistory } from 'react-router';
+import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
 import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast } from 'antd-mobile';
 import { Line, Jiange } from './Template'
@@ -35,7 +35,7 @@ if (minDate.getDate() !== maxDate.getDate()) {
     minDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
 }
 
-export default class Register extends Component {
+export default class RegisterDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -59,33 +59,26 @@ export default class Register extends Component {
             carNum: "",     //来访车牌
             identity: ""    //访客身份
         };
-        this.handleBackPicSrc = (res) => {
+        this.handleVisitDetail = (res) => {
             console.log(res);
-            let tmpArrIds = this.state.ids;
-            tmpArrIds.push(res.data.id);
-            this.setState({
-                ids: tmpArrIds
-            })
         };
         this.handleSend = (res) =>{
             console.log(res);
-            if(res.success){
-                hashHistory.push({
-                    pathname: '/registerList'
-                });
-            }
         }
     }
     componentDidMount() {
-        this.props.router.setRouteLeaveHook(
-            this.props.route,
-            this.routerWillLeave
-        )
         if (!validate.getCookie('user_id')) {
             hashHistory.push({
                 pathname: '/login'
             });
         };
+        this.props.router.setRouteLeaveHook(
+            this.props.route,
+            this.routerWillLeave
+        )
+        runPromise('get_visitor_info', {
+            visitor_id:"9"
+        }, this.handleVisitDetail, false, "post");
     }
     routerWillLeave(nextLocation) {  //离开页面
         fstDate = '';
@@ -148,6 +141,7 @@ export default class Register extends Component {
             item.src = value.url;
             items.push(item);
         })
+        console.log(size);
         openPhotoSwipe(items, index);
     }
 
@@ -358,12 +352,7 @@ export default class Register extends Component {
                         <WhiteSpace size="xs" />
                     </div>
                 </div>
-                <div className="registerBtm" onClick={() => { 
-                    // this.sendVisitMsg();
-                    hashHistory.push({
-                        pathname: '/registerList'
-                    });
-                }}>
+                <div className="registerBtm" onClick={() => { this.sendVisitMsg()}}>
                     下一步
                 </div>
                 <PhotoSwipeItem />

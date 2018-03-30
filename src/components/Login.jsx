@@ -1,6 +1,6 @@
 import React from 'react'
-import { List, InputItem, Toast, Button, Modal, ActivityIndicator } from 'antd-mobile';
-import { Link, hashHistory } from 'react-router';
+import { List, InputItem, Toast, Button, ActivityIndicator } from 'antd-mobile';
+import { hashHistory } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
 
 
@@ -17,29 +17,31 @@ export default class Login extends React.Component {
             animating:false,
             // value: '15657185156',
             // keywords:'luolei251537',
-            value: '17683993335',
-            keywords: 'luolei1992',
+            value: '15657185156',
+            keywords: 'luolei251537',
             code:"",
             codeNum:2
         };
         this.handleSend = (res) => {
             console.log(res)
             if(res.success) {
-                hashHistory.goBack();
+                validate.setCookie('user_id',1001)
+                hashHistory.push({
+                    pathname: '/'
+                });
             }else{
                 
             }
         }
     }
+
     componentDidMount() {
-        if(validate.getCookie('user_id')){
+        if (!!validate.getCookie('user_id')) {
             hashHistory.push({
-                pathname: '/login',
-                query: { form: 'promise' }
+                pathname: '/'
             });
         };
     }
-   
     onErrorClick = (val) => { //验证错误回调
         if (this.state.hasError) {
             Toast.info(val,2,null,false);
@@ -63,11 +65,11 @@ export default class Login extends React.Component {
     onLogin() {       //确认登陆
         runPromise("login", {
             username: this.state.value,
-            password: this.state.keywords,
-            code: this.state.code
+            password: this.state.keywords
         }, this.handleSend, false, "post");
     }
     render() {
+        console.log("render")
         return (
             <QueueAnim className="topMargin" animConfig={[
                 { opacity: [1, 0], translateX: [0, 50] }
@@ -109,9 +111,7 @@ export default class Login extends React.Component {
                             <Button type="warning"
                                 className="loginBtn"
                                 onClick={()=>{
-                                    hashHistory.push({
-                                        pathname: '/register'
-                                    });
+                                    this.onLogin();
                                 }}
                             >登 陆</Button>
                         </div>
