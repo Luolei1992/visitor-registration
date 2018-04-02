@@ -7,7 +7,7 @@ import { getLocationParam } from './Template'
 
 let realData = [];
 let realDataLength = realData.length;
-const NUM_ROWS = 5;
+const NUM_ROWS = 8;
 let pageIndex = 0;
 
 export default class RegisterList extends Component {
@@ -18,37 +18,32 @@ export default class RegisterList extends Component {
         });
         this.state = {
             dataSource: dataSource.cloneWithRows(JSON.parse(sessionStorage.getItem("registerList")) ? JSON.parse(sessionStorage.getItem("registerList")) : []),
-            hasMore:false,
+            hasMore: false,
             refreshing: false,
             isLoading: true,
             height: "",
-            size:0
+            size: 0
         };
         this.genData = (pIndex = 0, realLength, data) => {
             let dataBlob = [];
-            dataBlob = data;
+            dataBlob = data || [];
             return dataBlob;
         };
         this.handleSend = (res) => {
             console.log(res);
             if (res.success) {
                 realData = res.data.item_list;
-                realDataLength = res.data.length;
-                if (pageIndex == 0) {
-                    this.rData = [];
-                    this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
-                    sessionStorage.setItem("registerList", JSON.stringify(realData));
-                } else {
-                    this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
-                }
-                const hei = document.documentElement.clientHeight - ReactDOM.findDOMNode(this.lv).parentNode.offsetTop;
+                realDataLength = res.data.item_list.length;
+                this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
+                sessionStorage.setItem("registerList", JSON.stringify(realData));
+                const hei = document.documentElement.clientHeight - document.querySelector(".pubStyleList").offsetTop
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(this.rData),
-                    hasMore: res.data.total_count > (this.state.size+5) ? true : false,
+                    hasMore: res.data.total_count > (this.state.size + 8) ? true : false,
                     // hasMore: true,
-                    isLoading: res.data.total_count > (this.state.size+5) ? true : false,
+                    isLoading: res.data.total_count > (this.state.size + 8) ? true : false,
                     // isLoading: true,
-                    size: this.state.size + 5,
+                    size: this.state.size + 8,
                     height: hei,
                 });
                 setTimeout(() => {
@@ -62,6 +57,9 @@ export default class RegisterList extends Component {
         }
     }
     componentDidMount() {
+        this.rData = this.genData();
+        console.log(this.rData);
+
         this.props.router.setRouteLeaveHook(
             this.props.route,
             this.routerWillLeave
@@ -78,6 +76,13 @@ export default class RegisterList extends Component {
             });
         }
         this.sendVisitMsg(0);
+    }
+    componentDidUpdate() {
+        if (this.state.useBodyScroll) {
+            document.body.style.overflow = 'auto';
+        } else {
+            document.body.style.overflow = 'hidden';
+        }
     }
     routerWillLeave(nextLocation) {  //离开页面
         pageIndex = 0;
@@ -99,22 +104,22 @@ export default class RegisterList extends Component {
     sendVisitMsg = (size) => {
         runPromise("get_visitor_list", {
             offset: size,
-            limit: 5
+            limit: 8
         }, this.handleSend, false, "post");
     }
 
     render() {
         const row = (rowData, sectionID, rowID) => {
             const obj = rowData;
-            let dateResize = (date) =>{
+            let dateResize = (date) => {
                 let fstDate = date.split(" ")[0];
                 let secDate = date.split(" ")[1].split(":");
-                secDate.splice(2,1);
+                secDate.splice(2, 1);
                 return fstDate + ' ' + secDate.join(":")
             }
             return (
                 <div key={rowID}>
-                    <div className="registerItem" onClick={()=>{
+                    <div className="registerItem" onClick={() => {
                         let flg = obj.display == 2 ? "/shareRegister" : "/registerDetail";
                         hashHistory.push({
                             pathname: flg,
@@ -122,15 +127,15 @@ export default class RegisterList extends Component {
                         });
                     }}>
                         <h3>
-                            {obj.visitor_name} 
+                            {obj.visitor_name}
                             {
-                                obj.display == 1 ? <span style={{ color:"#F05011" }}>待审核</span> : 
-                                obj.display == 2 ? <span style={{ color:"#3FD80A" }}>已通过</span> :
-                                obj.display == 3 ? <span style={{ color:"#FF0000" }}>{obj.refuse_code ? obj.refuse_code : 审核不通过}</span> :''
+                                obj.display == 1 ? <span style={{ color: "#F05011" }}>待审核</span> :
+                                    obj.display == 2 ? <span style={{ color: "#3FD80A" }}>已通过</span> :
+                                        obj.display == 3 ? <span style={{ color: "#FF0000" }}>{obj.refuse_code ? obj.refuse_code : 审核不通过}</span> : ''
                             }
                         </h3>
                         <p className="person">来访人数：{obj.person_num}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话：{obj.phone}</p>
-                        <p className="time">{obj.start_time.indexOf('-') != -1 ? dateResize(obj.start_time) : ""} ~ {obj.end_time.indexOf('-') != -1?dateResize(obj.end_time):""}</p>
+                        <p className="time">{obj.start_time.indexOf('-') != -1 ? dateResize(obj.start_time) : ""} ~ {obj.end_time.indexOf('-') != -1 ? dateResize(obj.end_time) : ""}</p>
                     </div>
                 </div>
             );
@@ -152,7 +157,7 @@ export default class RegisterList extends Component {
                 <div className="centerWrap" style={{ paddingBottom: "0" }}>
                     <div className="pubStyleList">
                         <ListView
-                            key={this.state.useBodyScroll}
+                            key={false}
                             ref={el => this.lv = el}
                             dataSource={this.state.dataSource}
                             renderFooter={() => (<div style={{ padding: "0 10px", textAlign: 'center' }}>
@@ -163,7 +168,7 @@ export default class RegisterList extends Component {
                                 overflow: "auto"
                             }}
                             renderRow={row}
-                            useBodyScroll={this.state.useBodyScroll}
+                            useBodyScroll={false}
                             pullToRefresh={<PullToRefresh
                                 refreshing={this.state.refreshing}
                                 onRefresh={this.onRefresh}
@@ -173,7 +178,7 @@ export default class RegisterList extends Component {
                         />
                     </div>
                 </div>
-                <div className="plusRegister" onClick={()=>{hashHistory.push({pathname:"/register"})}}>
+                <div className="plusRegister" onClick={() => { hashHistory.push({ pathname: "/register" }) }}>
                     <i className="iconfont icon-jia"></i>
                 </div>
             </div>

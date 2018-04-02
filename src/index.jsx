@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Router, Route, hashHistory, IndexRoute } from 'react-router';
 
+import "babel-polyfill";
+
 import App from './components/App';
 import Login from './components/Login';
 import Register from './components/Register';

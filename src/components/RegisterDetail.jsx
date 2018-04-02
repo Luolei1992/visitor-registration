@@ -74,7 +74,7 @@ export default class RegisterDetail extends Component {
                     card: res.data.identity_num,
                     reason: res.data.purpose,
                     sex: "",  //多出参数
-                    title: res.data.sex,  //多出参数
+                    title: res.data.gender==0?"男":"女",  //多出参数
                     is_vip: 0,   //多出参数
                     person_name: "", //多出参数
                     files: res.data.appendixs
@@ -113,23 +113,37 @@ export default class RegisterDetail extends Component {
         fstDate = '';
     }
     sendVisitMsg = () => {
-        runPromise("add_visitor", {
-            visitor_name: this.state.name,
-            phone: this.state.phone,
-            person_num: this.state.person,
-            start_time: this.state.dateCome,
-            end_time: this.state.dateLeave,
-            identity_type: 0,
-            identity_num: this.state.card,
-            purpose: this.state.reason,
-            sex: "",  //多出参数
-            is_vip: 0,   //多出参数
-            person_name: "", //多出参数
-            // title:this.state.title,   //缺少参数（标题）
-            // car_num: this.state.carNum,  //缺少参数(访客车牌)
-            // identity: this.state.identity, //缺少参数(访客身份)
-            // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
-        }, this.handleSend, true, "post");
+        if(this.state.name.replace(/(^\s*)|(\s*$)/g, "") == "" ){
+            Toast.info("姓名不能为空", 2, null, false);
+        }else if(this.state.hasError || this.state.phone.length != 11){
+            Toast.info("请输入正确的手机号", 2, null, false);
+        }else if(this.state.person == 0){
+            Toast.info("请输入正确的来访人数", 2, null, false);
+        }else if(this.state.dateCome.replace(/(^\s*)|(\s*$)/g, "") == ""){
+            Toast.info("请选择来访时间", 2, null, false);
+        }else if(this.state.dateLeave.replace(/(^\s*)|(\s*$)/g, "") == ""){
+            Toast.info("请选择离开时间", 2, null, false);
+        }else if(this.state.hasError1 || this.state.card.length < 15){
+            Toast.info("请输入15或18位有效身份证号", 2, null, false);
+        }else{
+            runPromise("add_visitor", {
+                visitor_name: this.state.name,
+                phone: this.state.phone,
+                person_num: this.state.person,
+                start_time: this.state.dateCome,
+                end_time: this.state.dateLeave,
+                identity_type: 0,
+                identity_num: this.state.card,
+                purpose: this.state.reason,
+                sex: "",  //多出参数
+                is_vip: 0,   //多出参数
+                person_name: "", //多出参数
+                // title:this.state.title,   //缺少参数（标题）
+                // car_num: this.state.carNum,  //缺少参数(访客车牌)
+                // identity: this.state.identity, //缺少参数(访客身份)
+                // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+            }, this.handleSend, false, "post");
+        }
     }
     onChange = (files, type, index) => {  //上传图片
         console.log(files, type, index);
@@ -176,9 +190,10 @@ export default class RegisterDetail extends Component {
 
     getPickerDate = (date) => {
         let d = new Date(date);
-        return (d.getMonth() + 1) + '月' + d.getDate() + '日' + ' '
-            + (d.getHours() > 10 ? d.getHours() : ('0' + d.getHours()))
-            + ':' + (d.getMinutes() > 10 ? d.getMinutes() : ('0' + d.getMinutes()));
+        return d.getFullYear() + '-' + ((d.getMonth() + 1) >= 10 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + '-'
+            + (d.getDate() >= 10 ? d.getDate() : '0' + d.getDate())+ ' '
+            + (d.getHours() >= 10 ? d.getHours() : ('0' + d.getHours()))
+            + ':' + (d.getMinutes() >= 10 ? d.getMinutes() : ('0' + d.getMinutes()));
     }
     getComeDatePicker = (date) => {
         secDate = new Date(date) ? new Date(date) : minDate;
@@ -418,11 +433,12 @@ export default class RegisterDetail extends Component {
                 <div className="registerDetailBtm">
                     <span style={{ backgroundColor: "#000" }}
                         onClick={() => {
-                            this.setState({
-                                disabled: true,
-                                edit: false,
-                                pageTitle: "访客详细"
-                            })
+                            // this.setState({
+                            //     disabled: true,
+                            //     edit: false,
+                            //     pageTitle: "访客详细"
+                            // })
+                            hashHistory.goBack();
                         }}
                     >取&nbsp;&nbsp;&nbsp;&nbsp;消</span>
                     <span style={{ display: this.state.disabled ? "inline-block" : "none" }}

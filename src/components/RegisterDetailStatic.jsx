@@ -62,7 +62,7 @@ export default class RegisterDetailStatic extends Component {
                     card: res.data.identity_num,
                     reason: res.data.purpose,
                     sex: "",  //多出参数
-                    title: res.data.sex,  //多出参数
+                    title: res.data.gender == 0?"男":"女",  //多出参数
                     is_vip: 0,   //多出参数
                     person_name: "", //多出参数
                     files: res.data.appendixs
@@ -150,7 +150,7 @@ export default class RegisterDetailStatic extends Component {
                                 <div className="pickerLeft">
                                     性别
                                 </div>
-                                <div className="wrapTwoPicker">
+                                <div className="wrapTwoPicker" style={{textAlign:"right",paddingRight:"15px"}}>
                                     {this.state.title=="男"?"男":this.state.title=="女"?"女":""}
                                 </div>
                             </div>

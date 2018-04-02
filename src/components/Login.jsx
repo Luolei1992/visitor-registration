@@ -27,7 +27,8 @@ export default class Login extends React.Component {
             if(res.success) {
                 validate.setCookie('user_id',1001)
                 hashHistory.push({
-                    pathname: '/registerList?username=123'
+                    pathname: '/registerList',
+                    query:{username:"123"}
                 });
             }else{
                 
@@ -38,7 +39,8 @@ export default class Login extends React.Component {
     componentDidMount() {
         if (!!validate.getCookie('user_id')) {
             hashHistory.push({
-                pathname: '/registerList?username=123'
+                pathname: '/registerList',
+                query:{username:"123"}
             });
         };
     }

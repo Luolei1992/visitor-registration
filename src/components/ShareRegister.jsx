@@ -42,7 +42,7 @@ export default class ShareRegister extends Component {
             add_time:"",
             qr_code:"https://www.baidu.com/",
             name: "",      //访客姓名
-            title: "",     //标题
+            title: "",     //性别
             phone: "",     //手机号码
             person: "",    //来访人数
             dateCome: "",  //来访时间
@@ -67,6 +67,7 @@ export default class ShareRegister extends Component {
                     identity_type: 0,
                     card: res.data.identity_num,
                     reason: res.data.purpose,
+                    title:this.state.gender==0?"男":"女",
                     sex: this.state.title,  //多出参数
                     is_vip: 0,   //多出参数
                     person_name: "", //多出参数
