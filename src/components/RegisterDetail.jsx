@@ -39,7 +39,7 @@ export default class RegisterDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            edit: true,
+            edit: false,
             files: [],
             isSelect: true,   //控制证件类型的颜色
             ids: [],     //上传图片id
@@ -47,9 +47,11 @@ export default class RegisterDetail extends Component {
             isCardType: false,
             cardType: "身份证",
             hasError: false,
-            hasError1:false,
+            hasError1: false,
+            disabled: true,
+            pageTitle: "访客详细",
             name: "",      //访客姓名
-            title: "",     //标题
+            title: "",     //性别
             phone: "",     //手机号码
             person: "",    //来访人数
             dateCome: "",  //来访时间
@@ -61,38 +63,65 @@ export default class RegisterDetail extends Component {
         };
         this.handleVisitDetail = (res) => {
             console.log(res);
+            if (res.success) {
+                this.setState({
+                    name: res.data.visitor_name,
+                    phone: res.data.phone,
+                    person: res.data.person_num,
+                    dateCome: this.dateResize(res.data.start_time),
+                    dateLeave: this.dateResize(res.data.end_time),
+                    identity_type: 0,
+                    card: res.data.identity_num,
+                    reason: res.data.purpose,
+                    sex: "",  //多出参数
+                    title: res.data.sex,  //多出参数
+                    is_vip: 0,   //多出参数
+                    person_name: "", //多出参数
+                    files: res.data.appendixs
+                    // title:this.state.title,   //缺少参数（标题）
+                    // car_num: this.state.carNum,  //缺少参数(访客车牌)
+                    // identity: this.state.identity, //缺少参数(访客身份)
+                    // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                })
+            }
         };
-        this.handleSend = (res) =>{
+        this.handleSend = (res) => {
             console.log(res);
         }
     }
+    dateResize = (date) => {
+        let fstDate = date.split(" ")[0];
+        let secDate = date.split(" ")[1].split(":");
+        secDate.splice(2, 1);
+        return fstDate + ' ' + secDate.join(":")
+    }
     componentDidMount() {
-        if (!validate.getCookie('user_id')) {
-            hashHistory.push({
-                pathname: '/login'
-            });
-        };
+        // if (!validate.getCookie('user_id')) {
+        //     hashHistory.push({
+        //         pathname: '/login'
+        //     });
+        // };
         this.props.router.setRouteLeaveHook(
             this.props.route,
             this.routerWillLeave
         )
         runPromise('get_visitor_info', {
-            visitor_id:"9"
+            visitor_id: this.props.location.query.id
         }, this.handleVisitDetail, false, "post");
     }
     routerWillLeave(nextLocation) {  //离开页面
         fstDate = '';
     }
-    sendVisitMsg=()=>{
+    sendVisitMsg = () => {
         runPromise("add_visitor", {
-            visitor_name:this.state.name,
-            phone:this.state.phone,
-            person_num:this.state.person,
-            start_time:this.state.dateCome,
-            end_time:this.state.dateLeave,  
-            identity_type:0,
-            identity_num:this.state.card,
-            purpose:this.state.reason, 
+            visitor_name: this.state.name,
+            phone: this.state.phone,
+            person_num: this.state.person,
+            start_time: this.state.dateCome,
+            end_time: this.state.dateLeave,
+            identity_type: 0,
+            identity_num: this.state.card,
+            purpose: this.state.reason,
             sex: "",  //多出参数
             is_vip: 0,   //多出参数
             person_name: "", //多出参数
@@ -206,7 +235,7 @@ export default class RegisterDetail extends Component {
                     rightContent={[
                         <Icon key="1" type="ellipsis" color="#fff" />,
                     ]}
-                >访客登记</NavBar>
+                >{this.state.pageTitle}</NavBar>
                 <div className="centerWrap">
                     <p className="warring">请输入访客基本身份信息（必填项）</p>
                     <div className="pubStyleList">
@@ -216,20 +245,45 @@ export default class RegisterDetail extends Component {
                                 editable={this.state.edit}
                                 ref={el => this.autoFocusInst = el}
                                 value={this.state.name}
-                                onChange={(value)=>{this.setState({name:value})}}
+                                style={{ textAlign: this.state.disabled ? "right" : "left" }}
+                                onChange={(value) => { this.setState({ name: value }) }}
                             >访客姓名</InputItem>
-                            <InputItem
-                                clear
-                                editable={this.state.edit}
-                                ref={el => this.customFocusInst = el}
-                                value={this.state.title}
-                                onChange={(value) => { this.setState({ title: value }) }}
-                            >标题</InputItem>
+                            <div className="datePickerWrap">
+                                <div className="pickerLeft">
+                                    性别
+                                </div>
+                                <div className="wrapTwoPicker">
+                                    <button
+                                        style={{
+                                            border: this.state.title == '男' ? '1px solid #6EB5E7' : '1px solid #ccc',
+                                            color: this.state.title == '男' ? "#6EB5E7" : "#6d6d6d",
+                                            margin: "0 10px",
+                                            padding: "5px",
+                                            borderRadius: "5px"
+                                        }}
+                                        onClick={() => {
+                                            this.state.disabled ? "" : this.setState({ title: "男" })
+                                        }}
+                                    >男 <i className="icon-xingbienan iconfont"></i></button>
+                                    <button
+                                        style={{
+                                            border: this.state.title == '女' ? '1px solid #FF3BC4' : '1px solid #ccc',
+                                            color: this.state.title == '女' ? "#FF3BC4" : "#6d6d6d",
+                                            margin: "0 10px",
+                                            padding: "5px",
+                                            borderRadius: "5px"
+                                        }}
+                                        onClick={() => {
+                                            this.state.disabled ?"":this.setState({ title: "女" })
+                                        }}
+                                    >女 <i className="icon-xingbienv iconfont"></i></button>
+                                </div>
+                            </div>
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 // error={this.state.hasError}
-                                style={{ color: this.state.hasError?"red":"#6d6d6d"}}
+                                style={{ color: this.state.hasError ? "red" : "#6d6d6d", textAlign: this.state.disabled ? "right" : "left" }}
                                 // onErrorClick={() => {
                                 //     this.onErrorClick(validate.CheckPhone(this.state.phone).errorMessage);
                                 // }}
@@ -243,7 +297,8 @@ export default class RegisterDetail extends Component {
                                 ref={el => this.customFocusInst = el}
                                 type="number"
                                 value={this.state.person}
-                                onChange={(value)=>{this.setState({person:value})}}
+                                style={{ textAlign: this.state.disabled ? "right" : "left" }}
+                                onChange={(value) => { this.setState({ person: value }) }}
                             >来访人数</InputItem>
 
                             <div className="datePickerWrap">
@@ -254,6 +309,7 @@ export default class RegisterDetail extends Component {
                                     <DatePicker
                                         minDate={minDate}
                                         maxDate={fstDate}
+                                        disabled={this.state.disabled}
                                         value={this.state.date}
                                         onChange={date => { this.getComeDatePicker(date) }}
                                     >
@@ -262,6 +318,7 @@ export default class RegisterDetail extends Component {
                                     <i className="fn-left hengxian">——</i>
                                     <DatePicker
                                         minDate={secDate}
+                                        disabled={this.state.disabled}
                                         value={this.state.date}
                                         onChange={date => { this.getLeaveDatePicker(date) }}
                                     >
@@ -304,9 +361,10 @@ export default class RegisterDetail extends Component {
                                     <input className="fn-left cardNum"
                                         maxLength="18"
                                         placeholder="证件号码"
+                                        disabled={this.state.disabled}
                                         value={this.state.card}
-                                        style={{color:this.state.hasError1?"red":"#6d6d6d"}}
-                                        onChange={(e) => { 
+                                        style={{ color: this.state.hasError1 ? "red" : "#6d6d6d" }}
+                                        onChange={(e) => {
                                             // this.setState({ card: e.currentTarget.value.replace(/[^\w\.\/]/ig, '') }) 
                                             this.setCardNum(e.currentTarget.value);
                                         }}
@@ -323,21 +381,25 @@ export default class RegisterDetail extends Component {
                                 className="comeForWhat"
                                 ref={el => this.autoFocusInst = el}
                                 autoHeight
+                                editable={this.state.edit}
                                 value={this.state.reason}
-                                onChange={(value)=>{this.setState({reason:value})}}
+                                style={{ textAlign: this.state.disabled ? "right" : "left" }}
+                                onChange={(value) => { this.setState({ reason: value }) }}
                             />
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 ref={el => this.customFocusInst = el}
                                 value={this.state.carNum}
-                                onChange={(value) => { this.setState({ carNum: value})}}
+                                style={{ textAlign: this.state.disabled ? "right" : "left" }}
+                                onChange={(value) => { this.setState({ carNum: value }) }}
                             >访客车牌</InputItem>
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 ref={el => this.customFocusInst = el}
                                 value={this.state.identity}
+                                style={{ textAlign: this.state.disabled ? "right" : "left" }}
                                 onChange={(value) => { this.setState({ identity: value }) }}
                             >访客身份</InputItem>
                         </List>
@@ -348,12 +410,34 @@ export default class RegisterDetail extends Component {
                             onImageClick={(index, fs) => { this.onTouchImg(index) }}
                             selectable={this.state.files.length < 10}
                             multiple={true}
+                            selectable={this.state.edit}
                         />
                         <WhiteSpace size="xs" />
                     </div>
                 </div>
-                <div className="registerBtm" onClick={() => { this.sendVisitMsg()}}>
-                    下一步
+                <div className="registerDetailBtm">
+                    <span style={{ backgroundColor: "#000" }}
+                        onClick={() => {
+                            this.setState({
+                                disabled: true,
+                                edit: false,
+                                pageTitle: "访客详细"
+                            })
+                        }}
+                    >取&nbsp;&nbsp;&nbsp;&nbsp;消</span>
+                    <span style={{ display: this.state.disabled ? "inline-block" : "none" }}
+                        onClick={() => {
+                            this.setState({
+                                disabled: false,
+                                edit: true,
+                                pageTitle: "编辑信息"
+                            })
+                        }}>再次编辑</span>
+                    <span style={{ display: this.state.disabled ? "none" : "inline-block" }}
+                        onClick={() => {
+                            this.sendVisitMsg()
+                        }}
+                    >保&nbsp;&nbsp;&nbsp;&nbsp;存</span>
                 </div>
                 <PhotoSwipeItem />
             </div>

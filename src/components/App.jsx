@@ -11,11 +11,10 @@ export default class App extends Component {
     }
 
     componentDidMount() {
-        if (!validate.getCookie('user_id')) {
-            hashHistory.push({
-                pathname: '/login'
-            });
-        };
+        // if (!validate.getCookie('user_id')) {
+            
+        // };
+        
     }
     render() {
         return (

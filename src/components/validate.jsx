@@ -89,7 +89,24 @@ const getNowFormatDate=()=> {
     let currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
     return currentdate;
 }
-
+const getLocationParam=(name)=> {
+    var url = window.location.href;
+    if (~url.indexOf("?")) {
+        var search = {};
+        var arrayParam = url.split("?")[1].split("&");
+        arrayParam.map(function (value, index, elem) {
+            var key = value.split("=")[0];
+            var val = value.split("=")[1];
+            search[key] = val;
+        });
+        if (name in search) {
+            return search[name];
+        } else {
+            return "";
+        }
+    }
+    return "";
+};
 export default {
     CheckPhone, 
     CheckKeywords, 
@@ -97,5 +114,6 @@ export default {
     setCookie,
     CheckEmail,
     getNowFormatDate,
-    CheckIdCard
+    CheckIdCard,
+    getLocationParam
 }

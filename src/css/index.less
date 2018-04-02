@@ -228,6 +228,22 @@
     line-height: 1.2rem;
     letter-spacing: 2px;
 }
+.registerDetailBtm {
+    height: 1.1rem;
+    text-align: center;
+    color: #fff;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 17px;
+    line-height: 1.1rem;
+    letter-spacing: 2px;
+    span {
+        background-color: #E60012;
+        display: inline-block;
+        width: 50%;
+    }
+}
 .changeCardType {
     position: absolute;
     background-color: #fff;
@@ -274,6 +290,95 @@
         text-align-last: justify;
     }
 }
+.registerItem {
+    padding: .4rem .46875rem;
+    color: #333;
+    border-top: 1px solid #EAEAEA;
+    border-bottom: 1px solid #EAEAEA;
+    margin: 8px 0;
+    h3 {
+        font-size: 24px;
+        height: 30px;
+        padding: 0 0 8px 0;
+        vertical-align: baseline;
+        span {
+            float: right;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+    }
+    .person {
+        color: #6B6B6B;
+        font-size: 14px;
+        line-height: 22px;
+    }
+    .time {
+        font-size: 14px;
+        color: #c5c5c5;
+        line-height: 22px;        
+    }
+}
+.plusRegister {
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    i {
+        color: red;
+        font-size: 40px;
+    }
+}
+.registerSuccess {
+    overflow: hidden;
+    text-align: center;
+    .alignCenter {
+        margin: 15px 0;
+        display: inline-block;
+        i {
+            font-size: 46px;
+            color: #30DD55;
+        }
+        .wrap {
+            margin-left: 5px;
+            p {
+                text-align: left;
+                padding: 2px 0;
+            }
+            .fst {
+                font-size: 16px;
+                color: #333;
+                padding-top: 10px;
+            }
+        }
+    }
+    .link {
+        color: #008AD9;
+        margin-bottom: 15px;
+        i {
+            margin: 0 20px;
+        }
+    }
+}
+.sharePic {
+    width: 120px;
+    height: 120px;
+    margin: 30px auto 0 auto;
+    img{
+        width: 100%;
+    }
+}
+.borderNone {
+    .datePickerWrap {
+        border-bottom: 1px solid #fff;
+    }
+}
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
+        html:not([data-scale]) .borderNone .am-list-body::before {
+            background-color: #fff;
+        }
+        html:not([data-scale]) .borderNone .am-list-body::after {
+            background-color: #fff;
+        }
+    }
 .line {
     background-color: #EFEFEF;
     height: 1px;

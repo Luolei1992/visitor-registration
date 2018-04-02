@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { hashHistory } from 'react-router';
+import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
 import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast } from 'antd-mobile';
 import { Line, Jiange } from './Template'
@@ -10,7 +10,6 @@ import '../js/photoswipe/default-skin/default-skin.css';
 import PhotoSwipe from '../js/photoswipe/photoswipe.min.js';
 import PhotoSwipeUI_Default from '../js/photoswipe/photoswipe-ui-default.min.js';
 
-let size = [];
 let openPhotoSwipe = function (items, index) {  //图片预览插件
     let pswpElement = document.querySelectorAll('.pswp')[0];
     let options = {
@@ -23,23 +22,11 @@ let openPhotoSwipe = function (items, index) {  //图片预览插件
 }
 
 
-const nowTimeStamp = Date.now();
-
-let minDate = new Date(nowTimeStamp);
-let fstDate = '';
-let secDate = minDate;
-const maxDate = new Date(nowTimeStamp + 1e7);
-// console.log(minDate, maxDate);
-if (minDate.getDate() !== maxDate.getDate()) {
-    // set the minDate to the 0 of maxDate
-    minDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
-}
-
-export default class Register extends Component {
+export default class RegisterDetailStatic extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            edit: true,
+            edit: false,
             files: [],
             isSelect: true,   //控制证件类型的颜色
             ids: [],     //上传图片id
@@ -48,8 +35,10 @@ export default class Register extends Component {
             cardType: "身份证",
             hasError: false,
             hasError1:false,
+            disabled:true,
+            isShow:false,
             name: "",      //访客姓名
-            title: "男",     //性别
+            title: "",     //性别
             phone: "",     //手机号码
             person: "",    //来访人数
             dateCome: "",  //来访时间
@@ -59,87 +48,51 @@ export default class Register extends Component {
             carNum: "",     //来访车牌
             identity: ""    //访客身份
         };
-        this.handleBackPicSrc = (res) => {
+        this.handleVisitDetail = (res) => {
             console.log(res);
-            let tmpArrIds = this.state.ids;
-            tmpArrIds.push(res.data.id);
-            this.setState({
-                ids: tmpArrIds
-            })
-        };
-        this.handleSend = (res) =>{
-            console.log(res);
-            if(res.success){
-                hashHistory.push({
-                    pathname: '/registerStatic',
-                    query: { id: res.message}
-                });
-            }else{
-                Toast.info(res.message, 2, null, false);
+            if(res.success) {
+                this.setState({
+                    isShow: res.data.appendixs.length>0?true:false,
+                    name: res.data.visitor_name,
+                    phone: res.data.phone,
+                    person: res.data.person_num,
+                    dateCome: this.dateResize(res.data.start_time),
+                    dateLeave: this.dateResize(res.data.end_time),
+                    identity_type: 0,
+                    card: res.data.identity_num,
+                    reason: res.data.purpose,
+                    sex: "",  //多出参数
+                    title: res.data.sex,  //多出参数
+                    is_vip: 0,   //多出参数
+                    person_name: "", //多出参数
+                    files: res.data.appendixs
+                    // title:this.state.title,   //缺少参数（标题）
+                    // car_num: this.state.carNum,  //缺少参数(访客车牌)
+                    // identity: this.state.identity, //缺少参数(访客身份)
+                    // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                })
             }
-        }
+        };
+    }
+    dateResize = (date) =>{
+        let fstDate = date.split(" ")[0];
+        let secDate = date.split(" ")[1].split(":");
+        secDate.splice(2,1);
+        return fstDate + ' ' + secDate.join(":")
     }
     componentDidMount() {
-        this.props.router.setRouteLeaveHook(
-            this.props.route,
-            this.routerWillLeave
-        )
         // if (!validate.getCookie('user_id')) {
         //     hashHistory.push({
         //         pathname: '/login'
         //     });
         // };
-    }
-    routerWillLeave(nextLocation) {  //离开页面
-        fstDate = '';
-    }
-    sendVisitMsg=()=>{
-        runPromise("add_visitor", {
-            visitor_name:this.state.name,
-            phone:this.state.phone,
-            person_num:this.state.person,
-            start_time:this.state.dateCome,
-            end_time:this.state.dateLeave,  
-            identity_type:0,
-            identity_num:this.state.card,
-            purpose:this.state.reason, 
-            sex: "男",  //多出参数
-            is_vip: 0,   //多出参数
-            person_name: "", //多出参数
-            // title:this.state.title,   //缺少参数（标题）
-            // car_num: this.state.carNum,  //缺少参数(访客车牌)
-            // identity: this.state.identity, //缺少参数(访客身份)
-            // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
-        }, this.handleSend, true, "post");
-    }
-    onChange = (files, type, index) => {  //上传图片
-        console.log(files, type, index);
-        let img, item;
-        if (files.length > 0) {
-            img = new Image();
-            item = {};
-        }
-        img.src = files[files.length - 1].url;
-        img.onload = function (argument) {
-            item.w = this.width;
-            item.h = this.height;
-        }
-        if (type == 'remove') {
-            this.state.ids.splice(index, 1);
-            this.state.files.splice(index, 1);
-            size.splice(index, 1);
-            this.setState({
-                files,
-            });
-        } else {
-            size.push(item);
-            runPromise('upload_image', {
-                "arr": files[files.length - 1].url
-            }, this.handleBackPicSrc, false, "post");
-            this.setState({
-                files,
-            });
-        }
+        this.props.router.setRouteLeaveHook(
+            this.props.route,
+            this.routerWillLeave
+        )
+        runPromise('get_visitor_info', {
+            visitor_id: this.props.location.query.id
+        }, this.handleVisitDetail, false, "post");
     }
 
     onTouchImg = (index) => {   //点击图片开始预览
@@ -151,60 +104,12 @@ export default class Register extends Component {
             item.src = value.url;
             items.push(item);
         })
+        console.log(size);
         openPhotoSwipe(items, index);
-    }
-
-    getPickerDate = (date) => {
-        let d = new Date(date);
-        return d.getFullYear() + '/' + ((d.getMonth() + 1) >= 10 ? (d.getMonth() + 1) : '0' + (d.getMonth() + 1)) + '/'
-            + (d.getDate() >= 10 ? d.getDate() : '0' + d.getDate())+ ' '
-            + (d.getHours() >= 10 ? d.getHours() : ('0' + d.getHours()))
-            + ':' + (d.getMinutes() >= 10 ? d.getMinutes() : ('0' + d.getMinutes()));
-    }
-    getComeDatePicker = (date) => {
-        secDate = new Date(date) ? new Date(date) : minDate;
-        let time = this.getPickerDate(date);
-        this.setState({ dateCome: time });
-    }
-    getLeaveDatePicker = (date) => {
-        fstDate = new Date(date) ? new Date(date) : maxDate;
-        let time = this.getPickerDate(date);
-        this.setState({ dateLeave: time });
-    }
-    whichClick = (e) => {
-        let hasClass = e.target.getAttribute('class');
-        if (hasClass && hasClass.indexOf('isSelect') != -1) {
-            this.setState({
-                isCardType: !this.state.isCardType
-            })
-        } else {
-            this.setState({
-                isCardType: false
-            })
-        }
-    }
-    onChangePhone = (value) => {  //用户名输入
-        this.setState({
-            hasError: validate.CheckPhone(value).hasError,
-            phone: value
-        });
-    }
-    // onErrorClick = (val) => { //验证错误回调
-    //     if (this.state.hasError) {
-    //         Toast.info(val, 2, null, false);
-    //     } else if (this.state.error) {
-    //         Toast.info(val, 2, null, false);
-    //     }
-    // }
-    setCardNum = (value) => {
-        this.setState({
-            hasError1: validate.CheckIdCard(value).hasError,
-            card: value
-        });
     }
     render() {
         return (
-            <div className="registerWrap" onClick={(e) => { this.whichClick(e) }}>
+            <div className="registerWrap">
                 <NavBar
                     mode="dark"
                     className="pubHeadStyle"
@@ -216,16 +121,29 @@ export default class Register extends Component {
                     rightContent={[
                         <Icon key="1" type="ellipsis" color="#fff" />,
                     ]}
-                >访客登记</NavBar>
+                >访客详细</NavBar>
                 <div className="centerWrap">
-                    <p className="warring">请输入访客基本身份信息（必填项）</p>
                     <div className="pubStyleList">
+                        <div className="registerSuccess">
+                            <div className="alignCenter">
+                                <i className="iconfont icon-icon fn-left"></i>
+                                <div className="fn-left wrap">
+                                    <p className="fst">成功提交</p>
+                                    <p>等待管理员审核!</p>
+                                </div>
+                            </div>
+                            <p className="link">
+                                <span onClick={() => { hashHistory.push({ pathname: '/registerList'})}}>访客列表</span> <i>|</i> 
+                                <span onClick={() => { hashHistory.push({ pathname: '/register' }) }}>继续添加</span>
+                            </p>
+                        </div>
                         <List>
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 ref={el => this.autoFocusInst = el}
-                                value={this.state.name}
+                                value={this.state.name} 
+                                style={{ textAlign: "right" }}
                                 onChange={(value)=>{this.setState({name:value})}}
                             >访客姓名</InputItem>
                             <div className="datePickerWrap">
@@ -233,44 +151,20 @@ export default class Register extends Component {
                                     性别
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    <button 
-                                        style={{
-                                            border:this.state.title=='男'?'1px solid #6EB5E7':'1px solid #ccc',
-                                            color: this.state.title == '男' ? "#6EB5E7" :"#6d6d6d",
-                                            margin:"0 10px",
-                                            padding:"5px",
-                                            borderRadius:"5px"
-                                        }}
-                                        onClick={()=>{
-                                            this.setState({title:"男"})
-                                        }}
-                                    >男 <i className="icon-xingbienan iconfont"></i></button>
-                                    <button 
-                                        style={{
-                                            border: this.state.title == '女' ? '1px solid #FF3BC4' : '1px solid #ccc',
-                                            color: this.state.title == '女' ? "#FF3BC4" : "#6d6d6d",
-                                            margin: "0 10px",
-                                            padding:"5px",
-                                            borderRadius: "5px"
-                                        }}
-                                        onClick={() => {
-                                            this.setState({ title: "女" })
-                                        }}
-                                    >女 <i className="icon-xingbienv iconfont"></i></button>
+                                    {this.state.title=="男"?"男":this.state.title=="女"?"女":""}
                                 </div>
                             </div>
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 // error={this.state.hasError}
-                                style={{ color: this.state.hasError?"red":"#6d6d6d"}}
+                                style={{ color: this.state.hasError ? "red" : "#6d6d6d",textAlign:"right"}}
                                 // onErrorClick={() => {
                                 //     this.onErrorClick(validate.CheckPhone(this.state.phone).errorMessage);
                                 // }}
                                 value={this.state.phone}
                                 onChange={this.onChangePhone}
                                 ref={el => this.customFocusInst = el}
-                                maxLength={11}
                             >联系电话</InputItem>
                             <InputItem
                                 clear
@@ -278,6 +172,7 @@ export default class Register extends Component {
                                 ref={el => this.customFocusInst = el}
                                 type="number"
                                 value={this.state.person}
+                                style={{ textAlign: "right"}}
                                 onChange={(value)=>{this.setState({person:value})}}
                             >来访人数</InputItem>
 
@@ -286,22 +181,9 @@ export default class Register extends Component {
                                     来访时间
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    <DatePicker
-                                        minDate={minDate}
-                                        maxDate={fstDate}
-                                        value={this.state.date}
-                                        onChange={date => { this.getComeDatePicker(date) }}
-                                    >
-                                        <input className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
-                                    </DatePicker>
+                                    <input className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
                                     <i className="fn-left hengxian">——</i>
-                                    <DatePicker
-                                        minDate={secDate}
-                                        value={this.state.date}
-                                        onChange={date => { this.getLeaveDatePicker(date) }}
-                                    >
-                                        <input className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
-                                    </DatePicker>
+                                    <input className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
                                 </div>
                             </div>
                             <div className="datePickerWrap">
@@ -339,8 +221,9 @@ export default class Register extends Component {
                                     <input className="fn-left cardNum"
                                         maxLength="18"
                                         placeholder="证件号码"
+                                        disabled={this.state.disabled}
                                         value={this.state.card}
-                                        style={{color:this.state.hasError1?"red":"#6d6d6d"}}
+                                        style={{ color: this.state.hasError1 ? "red" : "#6d6d6d",textAlign: "right" }}
                                         onChange={(e) => { 
                                             // this.setState({ card: e.currentTarget.value.replace(/[^\w\.\/]/ig, '') }) 
                                             this.setCardNum(e.currentTarget.value);
@@ -358,7 +241,9 @@ export default class Register extends Component {
                                 className="comeForWhat"
                                 ref={el => this.autoFocusInst = el}
                                 autoHeight
+                                editable={this.state.edit}
                                 value={this.state.reason}
+                                style={{ textAlign:"right" }}
                                 onChange={(value)=>{this.setState({reason:value})}}
                             />
                             <InputItem
@@ -366,6 +251,7 @@ export default class Register extends Component {
                                 editable={this.state.edit}
                                 ref={el => this.customFocusInst = el}
                                 value={this.state.carNum}
+                                style={{ textAlign: "right" }}
                                 onChange={(value) => { this.setState({ carNum: value})}}
                             >访客车牌</InputItem>
                             <InputItem
@@ -373,6 +259,7 @@ export default class Register extends Component {
                                 editable={this.state.edit}
                                 ref={el => this.customFocusInst = el}
                                 value={this.state.identity}
+                                style={{ textAlign: "right" }}
                                 onChange={(value) => { this.setState({ identity: value }) }}
                             >访客身份</InputItem>
                         </List>
@@ -383,17 +270,11 @@ export default class Register extends Component {
                             onImageClick={(index, fs) => { this.onTouchImg(index) }}
                             selectable={this.state.files.length < 10}
                             multiple={true}
+                            selectable={this.state.edit}
                         />
                         <WhiteSpace size="xs" />
+                        <span style={{ marginLeft: "15px",display:this.state.isShow?"none":"block" }}>附件：暂无</span>
                     </div>
-                </div>
-                <div className="registerBtm" onClick={() => { 
-                    this.sendVisitMsg();
-                    // hashHistory.push({
-                    //     pathname: '/registerList'
-                    // });
-                }}>
-                    下一步
                 </div>
                 <PhotoSwipeItem />
             </div>

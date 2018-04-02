@@ -7,6 +7,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import RegisterList from './components/RegisterList';
 import RegisterDetail from './components/RegisterDetail';
+import RegisterDetailStatic from './components/RegisterDetailStatic';
+import ShareRegister from './components/ShareRegister';
 
 
 import './css/font/iconfont.css'
@@ -22,6 +24,8 @@ ReactDOM.render(
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/registerDetail" component={RegisterDetail} />
+            <Route path="/registerStatic" component={RegisterDetailStatic} />
+            <Route path="/shareRegister" component={ShareRegister} />
         </Route>
     </Router>
     , document.getElementById('visitorWrap'));

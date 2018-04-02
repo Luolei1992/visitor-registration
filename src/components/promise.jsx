@@ -17,6 +17,7 @@ const ajaxURLList = {
     add_visitor:"fkapi/add_visitor",                //新增访客
     get_visitor_list:"fkapi/get_visitor_list",      //获取访客列表
     get_visitor_info:"fkapi/get_visitor_info",      //获取访客详细信息
+    upload_image:"fkapi/upload_image",      //上传图片
 }
 
 //定义一个基于Promise的异步任务执行器
@@ -58,6 +59,7 @@ export default function runPromise(ajaxName, param, handle, mustLogin = false, m
     let cookie_user_id = getCookie('user_id');
     if (mustLogin && !cookie_user_id) {
         //如果没登录，跳转到登录页
+        alert(125)
         hashHistory.push({
             pathname: '/login'
         });

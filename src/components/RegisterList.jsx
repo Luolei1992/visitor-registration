@@ -2,13 +2,12 @@ import React, { Component } from 'react'
 import { hashHistory, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
 import { NavBar, Icon, PullToRefresh, ListView } from 'antd-mobile';
-import { Line, Jiange } from './Template'
-
+import { getLocationParam } from './Template'
 
 
 let realData = [];
 let realDataLength = realData.length;
-const NUM_ROWS = 10;
+const NUM_ROWS = 5;
 let pageIndex = 0;
 
 export default class RegisterList extends Component {
@@ -23,6 +22,7 @@ export default class RegisterList extends Component {
             refreshing: false,
             isLoading: true,
             height: "",
+            size:0
         };
         this.genData = (pIndex = 0, realLength, data) => {
             let dataBlob = [];
@@ -32,7 +32,7 @@ export default class RegisterList extends Component {
         this.handleSend = (res) => {
             console.log(res);
             if (res.success) {
-                realData = res.data;
+                realData = res.data.item_list;
                 realDataLength = res.data.length;
                 if (pageIndex == 0) {
                     this.rData = [];
@@ -44,11 +44,11 @@ export default class RegisterList extends Component {
                 const hei = document.documentElement.clientHeight - ReactDOM.findDOMNode(this.lv).parentNode.offsetTop;
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(this.rData),
-                    // hasMore: res.data.total_count > this.state.size ? true : false,
-                    hasMore: true,
-                    // isLoading: res.data.total_count > this.state.size ? true : false,
-                    isLoading: true,
-                    size: this.state.size + 8,
+                    hasMore: res.data.total_count > (this.state.size+5) ? true : false,
+                    // hasMore: true,
+                    isLoading: res.data.total_count > (this.state.size+5) ? true : false,
+                    // isLoading: true,
+                    size: this.state.size + 5,
                     height: hei,
                 });
                 setTimeout(() => {
@@ -66,12 +66,18 @@ export default class RegisterList extends Component {
             this.props.route,
             this.routerWillLeave
         )
-        if (!validate.getCookie('user_id')) {
+        // if (!validate.getCookie('user_id')) {
+        //     hashHistory.push({
+        //         pathname: '/login'
+        //     });
+        // };
+        console.log(!validate.getLocationParam("username"));
+        if (!validate.getLocationParam("username")) {
             hashHistory.push({
                 pathname: '/login'
             });
-        };
-        this.sendVisitMsg();
+        }
+        this.sendVisitMsg(0);
     }
     routerWillLeave(nextLocation) {  //离开页面
         pageIndex = 0;
@@ -81,29 +87,50 @@ export default class RegisterList extends Component {
             refreshing: true
         });
         pageIndex = 0;
-        this.sendVisitMsg();
+        this.sendVisitMsg(0);
     };
     onEndReached = (event) => {
         // load new data   数据加载完成
         if (!this.state.isLoading && !this.state.hasMore) {
             return;
         }
-        this.sendVisitMsg();
+        this.sendVisitMsg(this.state.size);
     };
-    sendVisitMsg = () => {
+    sendVisitMsg = (size) => {
         runPromise("get_visitor_list", {
-            offset: 0,
-            limit: 10
+            offset: size,
+            limit: 5
         }, this.handleSend, false, "post");
     }
 
     render() {
         const row = (rowData, sectionID, rowID) => {
             const obj = rowData;
+            let dateResize = (date) =>{
+                let fstDate = date.split(" ")[0];
+                let secDate = date.split(" ")[1].split(":");
+                secDate.splice(2,1);
+                return fstDate + ' ' + secDate.join(":")
+            }
             return (
                 <div key={rowID}>
-                    <div style={{}}>
-                        hahah
+                    <div className="registerItem" onClick={()=>{
+                        let flg = obj.display == 2 ? "/shareRegister" : "/registerDetail";
+                        hashHistory.push({
+                            pathname: flg,
+                            query: { id: obj.id },
+                        });
+                    }}>
+                        <h3>
+                            {obj.visitor_name} 
+                            {
+                                obj.display == 1 ? <span style={{ color:"#F05011" }}>待审核</span> : 
+                                obj.display == 2 ? <span style={{ color:"#3FD80A" }}>已通过</span> :
+                                obj.display == 3 ? <span style={{ color:"#FF0000" }}>{obj.refuse_code ? obj.refuse_code : 审核不通过}</span> :''
+                            }
+                        </h3>
+                        <p className="person">来访人数：{obj.person_num}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话：{obj.phone}</p>
+                        <p className="time">{obj.start_time.indexOf('-') != -1 ? dateResize(obj.start_time) : ""} ~ {obj.end_time.indexOf('-') != -1?dateResize(obj.end_time):""}</p>
                     </div>
                 </div>
             );
@@ -122,7 +149,7 @@ export default class RegisterList extends Component {
                         <Icon key="1" type="ellipsis" color="#fff" />,
                     ]}
                 >访客列表</NavBar>
-                <div className="centerWrap">
+                <div className="centerWrap" style={{ paddingBottom: "0" }}>
                     <div className="pubStyleList">
                         <ListView
                             key={this.state.useBodyScroll}
@@ -145,6 +172,9 @@ export default class RegisterList extends Component {
                             pageSize={9}
                         />
                     </div>
+                </div>
+                <div className="plusRegister" onClick={()=>{hashHistory.push({pathname:"/register"})}}>
+                    <i className="iconfont icon-jia"></i>
                 </div>
             </div>
         );
