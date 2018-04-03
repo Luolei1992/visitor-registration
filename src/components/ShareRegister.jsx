@@ -22,7 +22,7 @@ let openPhotoSwipe = function (items, index) {  //图片预览插件
     gallery.init();
 }
 
-let imgUrl = require('../image/er.png');
+let imgUrl = require('../image/erweima.png');
 
 export default class ShareRegister extends Component {
     constructor(props) {
@@ -40,7 +40,7 @@ export default class ShareRegister extends Component {
             disabled:true,
             isShow:false,
             add_time:"",
-            qr_code:"https://www.baidu.com/",
+            qr_code:"",
             name: "",      //访客姓名
             title: "",     //性别
             phone: "",     //手机号码
@@ -53,13 +53,12 @@ export default class ShareRegister extends Component {
             identity: ""    //访客身份
         };
         this.handleVisitDetail = (res) => {
-            console.log(res);
             if(res.success) {
                 this.setState({
-                    isShow: res.data.appendixs.length>0?true:false,
                     add_time: this.dateResize(res.data.add_time),
+                    qr_code:res.data.qr_code || "http://www.baidu.com",
+                    isShow: res.data.appendixs.length > 0 ? true : false,
                     name: res.data.visitor_name,
-                    qr_code:res.data.qr_code,
                     phone: res.data.phone,
                     person: res.data.person_num,
                     dateCome: this.dateResize(res.data.start_time),
@@ -67,15 +66,18 @@ export default class ShareRegister extends Component {
                     identity_type: 0,
                     card: res.data.identity_num,
                     reason: res.data.purpose,
-                    title:this.state.gender==0?"男":"女",
-                    sex: this.state.title,  //多出参数
-                    is_vip: 0,   //多出参数
+                    title: res.data.gender,  //多出参数
+                    // is_vip: 0,   //多出参数
                     person_name: "", //多出参数
-                    files: res.data.appendixs
-                    // title:this.state.title,   //缺少参数（标题）
-                    // car_num: this.state.carNum,  //缺少参数(访客车牌)
-                    // identity: this.state.identity, //缺少参数(访客身份)
-                    // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                    files: this.newArray(res.data.appendixs),
+                    carNum: res.data.plate_num,  //缺少参数(访客车牌)
+                    selec: res.data.is_vip, //缺少参数(访客身份)
+                },()=>{
+                    new QRious({
+                        element: document.getElementById('qrious'),
+                        size: 140,
+                        value: this.state.qr_code
+                    })
                 })
             }
         };
@@ -85,6 +87,18 @@ export default class ShareRegister extends Component {
         let secDate = date.split(" ")[1].split(":");
         secDate.splice(2,1);
         return fstDate + ' ' + secDate.join(":")
+    }
+    newArray = (arr) => {
+        let newArr = [];
+        arr.map((value) => {
+            let tmp = {};
+            tmp.id = value.id;
+            tmp.url = "http://" + value.path;
+            tmp.width = value.width;
+            tmp.height = value.height;
+            newArr.push(tmp);
+        })
+        return newArr;
     }
     componentDidMount() {
         // if (!validate.getCookie('user_id')) {
@@ -99,25 +113,19 @@ export default class ShareRegister extends Component {
         runPromise('get_visitor_info', {
             visitor_id: this.props.location.query.id
         }, this.handleVisitDetail, false, "post");
-        new QRious({
-            element: document.getElementById('qrious'),
-            size: 120,
-            value: this.state.qr_code || 'http://www.baidu.com/'
-        })
     }
 
-    onTouchImg = (index) => {   //点击图片开始预览
-        let items = [];
-        this.state.files.map((value) => {
-            let item = {};
-            item.w = size[index].w;
-            item.h = size[index].h;
-            item.src = value.url;
-            items.push(item);
-        })
-        console.log(size);
-        openPhotoSwipe(items, index);
-    }
+    // onTouchImg = (index) => {   //点击图片开始预览
+    //     let items = [];
+    //     this.state.files.map((value) => {
+    //         let item = {};
+    //         item.w = size[index].w;
+    //         item.h = size[index].h;
+    //         item.src = value.url;
+    //         items.push(item);
+    //     })
+    //     openPhotoSwipe(items, index);
+    // }
 
     render() {
         return (
@@ -130,9 +138,9 @@ export default class ShareRegister extends Component {
                         <i >返回</i>
                     </p>}
                     onLeftClick={() => hashHistory.goBack()}
-                    rightContent={[
-                        <Icon key="1" type="ellipsis" color="#fff" />,
-                    ]}
+                    // rightContent={[
+                    //     <Icon key="1" type="ellipsis" color="#fff" />,
+                    // ]}
                 >访客详细</NavBar>
                 <div className="centerWrap borderNone">
                     <p style={{padding:"10px 0 5px 15px"}}>时间：{this.state.add_time.split(" ")[0]}</p>
@@ -152,7 +160,7 @@ export default class ShareRegister extends Component {
                                     性别
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    {this.state.title == "男" ? "男" : this.state.title == "女"?"女":""}
+                                    {this.state.title == "1" ? "男" : this.state.title == "2"?"女":""}
                                 </div>
                             </div>
                             <InputItem
@@ -244,11 +252,17 @@ export default class ShareRegister extends Component {
                         /> */}
 
                         {/* <span style={{ marginLeft: "15px",display:this.state.isShow?"none":"block" }}>附件：暂无</span> */}
-                        <div className="sharePic" style={{ background: "url(" + imgUrl +") center center /100% 100% "}}>
-                            <img   id="qrious"/>
-                        </div>
-                        <p style={{textAlign:"center",marginTop:"5px",color:"#000"}}>微信通知访客</p>
+                        {
+                            this.state.qr_code == null || this.state.qr_code == "null" || this.state.qr_code == undefined || this.state.qr_code == "undefined" || this.state.qr_code == ""?""
+                            :<div>
+                                <div className="sharePic" style={{ background: "url(" + imgUrl + ") center center /100% 100% " }}>
+                                    <img id="qrious" />
+                                </div>
+                                <p style={{ textAlign: "center", marginTop: "5px", color: "#000" }}>微信通知访客</p>
+                            </div>
+                        }
                     </div>
+                    <span style={{ position: "absolute", right: "15px", bottom: "15px", color:"#D6D6D6"}}>来自 浙商证券</span>
                 </div>
                 <PhotoSwipeItem />
             </div>

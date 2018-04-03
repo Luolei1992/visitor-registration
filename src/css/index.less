@@ -58,6 +58,7 @@
                 line-height: .533333rem;
                 margin: .4rem 0 0  0;
                 border-bottom: 1PX solid #CBCBCB;
+                box-sizing: border-box;
                 position: relative;
                 padding-left: 0;
             }
@@ -136,6 +137,8 @@
     .am-list-item.am-input-item {
         padding-left: 0;
         height: 1.2rem;
+        line-height: 1.2rem;
+        box-sizing: border-box;
         .am-list-line {
             padding-left: 15px;
         }
@@ -178,9 +181,11 @@
             flex: 1; 
             input {
                 border: 0 none;
-                width: 48%;
-                text-align: center;
+                width: 100%;
+                text-align: left;
+                padding-right: 15px;
                 line-height: 1.2rem; 
+                box-sizing: border-box;
                 color: #6d6d6d;
             }
             
@@ -359,16 +364,36 @@
     }
 }
 .sharePic {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     margin: 30px auto 0 auto;
     img{
         width: 100%;
     }
 }
+.isVip {
+    // background-color: #F6F6F6;
+    // border-bottom: 1px solid #F6F6F6;
+    margin-right: 15px;
+    .my-radio {
+        font-size: 15px;
+        .am-radio {
+            padding: 2.5px;
+            border: 1px solid #ccc;
+            border-radius: 50%;
+            margin-right: 5px;
+            position: relative;
+            top: -1px;
+        }
+    }
+}
+.imgPicStatic .am-image-picker-list .am-image-picker-item .am-image-picker-item-remove {display:none}
+
+ 
 .borderNone {
     .datePickerWrap {
         border-bottom: 1px solid #fff;
+        box-sizing: border-box;
     }
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
@@ -377,6 +402,9 @@
         }
         html:not([data-scale]) .borderNone .am-list-body::after {
             background-color: #fff;
+        }
+        html:not([data-scale]) .isVip .am-list-body::after {
+            background-color: #F6F6F6;
         }
     }
 .line {
@@ -389,7 +417,11 @@
     width: 100%;
     background-color: #F6F6F6;
 }
-
+.ellips {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
 //input组件样式更改
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){

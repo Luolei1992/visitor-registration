@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
-import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast } from 'antd-mobile';
+import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast, Flex ,Radio } from 'antd-mobile';
 import { Line, Jiange } from './Template'
 
 import PhotoSwipeItem from './photoSwipeElement.jsx';
@@ -49,6 +49,7 @@ export default class RegisterDetail extends Component {
             hasError: false,
             hasError1: false,
             disabled: true,
+            selec:false,
             pageTitle: "访客详细",
             name: "",      //访客姓名
             title: "",     //性别
@@ -60,6 +61,14 @@ export default class RegisterDetail extends Component {
             reason: "",   //来访事由
             carNum: "",     //来访车牌
             identity: ""    //访客身份
+        };
+        this.handleBackPicSrc = (res) => {
+            console.log(res);
+            let tmpArrIds = this.state.ids;
+            tmpArrIds.push(res.data.id);
+            this.setState({
+                ids: tmpArrIds
+            })
         };
         this.handleVisitDetail = (res) => {
             console.log(res);
@@ -73,20 +82,29 @@ export default class RegisterDetail extends Component {
                     identity_type: 0,
                     card: res.data.identity_num,
                     reason: res.data.purpose,
-                    sex: "",  //多出参数
-                    title: res.data.gender==0?"男":"女",  //多出参数
-                    is_vip: 0,   //多出参数
+                    title: res.data.gender,  //多出参数
+                    selec:res.data.is_vip,
                     person_name: "", //多出参数
-                    files: res.data.appendixs
-                    // title:this.state.title,   //缺少参数（标题）
-                    // car_num: this.state.carNum,  //缺少参数(访客车牌)
-                    // identity: this.state.identity, //缺少参数(访客身份)
-                    // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                    files: this.newArray(res.data.appendixs),
+                    carNum: res.data.plate_num,  //缺少参数(访客车牌)
                 })
             }
         };
         this.handleSend = (res) => {
             console.log(res);
+            if (res.success) {
+                // hashHistory.push({
+                //     pathname: '/registerStatic',
+                //     query: { id: res.message }
+                // });
+                this.setState({
+                    disabled: true,
+                    edit: false,
+                    pageTitle: "访客详细"
+                })
+            } else {
+                Toast.info(res.message, 2, null, false);
+            }
         }
     }
     dateResize = (date) => {
@@ -94,6 +112,21 @@ export default class RegisterDetail extends Component {
         let secDate = date.split(" ")[1].split(":");
         secDate.splice(2, 1);
         return fstDate + ' ' + secDate.join(":")
+    }
+    newArray = (arr) => {
+        let newArr = [];
+        let idArr = [];
+        arr.map((value) => {
+            let tmp = {};
+            tmp.id = value.id;
+            tmp.url = value.path.indexOf("http") != -1 ? value.path:"http://" + value.path;
+            tmp.width = value.width;
+            tmp.height = value.height;
+            idArr.push(value.id);
+            newArr.push(tmp);
+        })
+        this.setState({ids:idArr})
+        return newArr;
     }
     componentDidMount() {
         // if (!validate.getCookie('user_id')) {
@@ -135,13 +168,12 @@ export default class RegisterDetail extends Component {
                 identity_type: 0,
                 identity_num: this.state.card,
                 purpose: this.state.reason,
-                sex: "",  //多出参数
-                is_vip: 0,   //多出参数
-                person_name: "", //多出参数
-                // title:this.state.title,   //缺少参数（标题）
-                // car_num: this.state.carNum,  //缺少参数(访客车牌)
-                // identity: this.state.identity, //缺少参数(访客身份)
-                // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                sex: this.state.title,  
+                person_name: "", 
+                is_vip: this.state.selec ? 1 : 0,
+                plate_num: this.state.carNum,
+                appendix: this.state.ids.join("_"),
+                id: this.props.location.query.id
             }, this.handleSend, false, "post");
         }
     }
@@ -166,7 +198,7 @@ export default class RegisterDetail extends Component {
             });
         } else {
             size.push(item);
-            runPromise('upload_image_byw_upy2', {
+            runPromise('upload_image', {
                 "arr": files[files.length - 1].url
             }, this.handleBackPicSrc, false, "post");
             this.setState({
@@ -179,12 +211,11 @@ export default class RegisterDetail extends Component {
         let items = [];
         this.state.files.map((value) => {
             let item = {};
-            item.w = size[index].w;
-            item.h = size[index].h;
+            item.w = value.width || 300;
+            item.h = value.height || 300;
             item.src = value.url;
             items.push(item);
         })
-        console.log(size);
         openPhotoSwipe(items, index);
     }
 
@@ -247,9 +278,9 @@ export default class RegisterDetail extends Component {
                         <i >返回</i>
                     </p>}
                     onLeftClick={() => hashHistory.goBack()}
-                    rightContent={[
-                        <Icon key="1" type="ellipsis" color="#fff" />,
-                    ]}
+                    // rightContent={[
+                    //     <Icon key="1" type="ellipsis" color="#fff" />,
+                    // ]}
                 >{this.state.pageTitle}</NavBar>
                 <div className="centerWrap">
                     <p className="warring">请输入访客基本身份信息（必填项）</p>
@@ -267,29 +298,29 @@ export default class RegisterDetail extends Component {
                                 <div className="pickerLeft">
                                     性别
                                 </div>
-                                <div className="wrapTwoPicker">
+                                <div className="wrapTwoPicker" style={{textAlign:this.state.disabled?"right":"left"}}>
                                     <button
                                         style={{
-                                            border: this.state.title == '男' ? '1px solid #6EB5E7' : '1px solid #ccc',
-                                            color: this.state.title == '男' ? "#6EB5E7" : "#6d6d6d",
-                                            margin: "0 10px",
+                                            border: this.state.title == '1' ? '1px solid #6EB5E7' : '1px solid #ccc',
+                                            color: this.state.title == '1' ? "#6EB5E7" : "#6d6d6d",
+                                            margin: "0 15px",
                                             padding: "5px",
                                             borderRadius: "5px"
                                         }}
                                         onClick={() => {
-                                            this.state.disabled ? "" : this.setState({ title: "男" })
+                                            this.state.disabled ? "" : this.setState({ title: "1" })
                                         }}
                                     >男 <i className="icon-xingbienan iconfont"></i></button>
                                     <button
                                         style={{
-                                            border: this.state.title == '女' ? '1px solid #FF3BC4' : '1px solid #ccc',
-                                            color: this.state.title == '女' ? "#FF3BC4" : "#6d6d6d",
-                                            margin: "0 10px",
+                                            border: this.state.title == '2' ? '1px solid #FF3BC4' : '1px solid #ccc',
+                                            color: this.state.title == '2' ? "#FF3BC4" : "#6d6d6d",
+                                            margin: "0 15px",
                                             padding: "5px",
                                             borderRadius: "5px"
                                         }}
                                         onClick={() => {
-                                            this.state.disabled ?"":this.setState({ title: "女" })
+                                            this.state.disabled ?"":this.setState({ title: "2" })
                                         }}
                                     >女 <i className="icon-xingbienv iconfont"></i></button>
                                 </div>
@@ -328,7 +359,7 @@ export default class RegisterDetail extends Component {
                                         value={this.state.date}
                                         onChange={date => { this.getComeDatePicker(date) }}
                                     >
-                                        <input className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
+                                        <input className="fn-left ellips" placeholder="来访" value={this.state.dateCome} readOnly />
                                     </DatePicker>
                                     <i className="fn-left hengxian">——</i>
                                     <DatePicker
@@ -337,7 +368,7 @@ export default class RegisterDetail extends Component {
                                         value={this.state.date}
                                         onChange={date => { this.getLeaveDatePicker(date) }}
                                     >
-                                        <input className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
+                                        <input className="fn-left ellips" placeholder="离开" value={this.state.dateLeave} readOnly />
                                     </DatePicker>
                                 </div>
                             </div>
@@ -409,14 +440,22 @@ export default class RegisterDetail extends Component {
                                 style={{ textAlign: this.state.disabled ? "right" : "left" }}
                                 onChange={(value) => { this.setState({ carNum: value }) }}
                             >访客车牌</InputItem>
-                            <InputItem
-                                clear
-                                editable={this.state.edit}
-                                ref={el => this.customFocusInst = el}
-                                value={this.state.identity}
-                                style={{ textAlign: this.state.disabled ? "right" : "left" }}
-                                onChange={(value) => { this.setState({ identity: value }) }}
-                            >访客身份</InputItem>
+                            <div className="datePickerWrap isVip" style={{ textAlign: this.state.disabled ? "right" : "left" }}>
+                                <div className="pickerLeft">
+                                    访客身份
+                                </div>
+                                <div className="wrapTwoPicker">
+                                    <Flex.Item>
+                                        <Radio className="my-radio"
+                                            checked={this.state.selec==1?true:false}
+                                            disabled={this.state.disabled}
+                                            onChange={e => {
+                                                this.setState({ selec: !this.state.selec })
+                                            }}
+                                        >是否为VIP客户</Radio>
+                                    </Flex.Item>
+                                </div>
+                            </div>
                         </List>
                         <WhiteSpace size="xs" />
                         <ImagePicker
@@ -433,11 +472,6 @@ export default class RegisterDetail extends Component {
                 <div className="registerDetailBtm">
                     <span style={{ backgroundColor: "#000" }}
                         onClick={() => {
-                            // this.setState({
-                            //     disabled: true,
-                            //     edit: false,
-                            //     pageTitle: "访客详细"
-                            // })
                             hashHistory.goBack();
                         }}
                     >取&nbsp;&nbsp;&nbsp;&nbsp;消</span>

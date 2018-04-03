@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
-import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast } from 'antd-mobile';
+import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast, Flex, Radio  } from 'antd-mobile';
 import { Line, Jiange } from './Template'
 
 import PhotoSwipeItem from './photoSwipeElement.jsx';
@@ -21,7 +21,7 @@ let openPhotoSwipe = function (items, index) {  //图片预览插件
     gallery.init();
 }
 
-
+let size = [];
 export default class RegisterDetailStatic extends Component {
     constructor(props) {
         super(props);
@@ -37,6 +37,7 @@ export default class RegisterDetailStatic extends Component {
             hasError1:false,
             disabled:true,
             isShow:false,
+            selec:false,
             name: "",      //访客姓名
             title: "",     //性别
             phone: "",     //手机号码
@@ -61,15 +62,12 @@ export default class RegisterDetailStatic extends Component {
                     identity_type: 0,
                     card: res.data.identity_num,
                     reason: res.data.purpose,
-                    sex: "",  //多出参数
-                    title: res.data.gender == 0?"男":"女",  //多出参数
+                    title: res.data.gender,  //多出参数
                     is_vip: 0,   //多出参数
                     person_name: "", //多出参数
-                    files: res.data.appendixs
-                    // title:this.state.title,   //缺少参数（标题）
-                    // car_num: this.state.carNum,  //缺少参数(访客车牌)
-                    // identity: this.state.identity, //缺少参数(访客身份)
-                    // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                    files: this.newArray(res.data.appendixs),
+                    carNum: res.data.plate_num,  //缺少参数(访客车牌)
+                    selec: res.data.is_vip, //缺少参数(访客身份)
                 })
             }
         };
@@ -79,6 +77,18 @@ export default class RegisterDetailStatic extends Component {
         let secDate = date.split(" ")[1].split(":");
         secDate.splice(2,1);
         return fstDate + ' ' + secDate.join(":")
+    }
+    newArray = (arr) => {
+        let newArr = [];
+        arr.map((value)=>{
+            let tmp = {};
+            tmp.id = value.id;
+            tmp.url = "http://"+value.path;
+            tmp.width = value.width;
+            tmp.height = value.height;
+            newArr.push(tmp);
+        })
+        return newArr;
     }
     componentDidMount() {
         // if (!validate.getCookie('user_id')) {
@@ -99,12 +109,11 @@ export default class RegisterDetailStatic extends Component {
         let items = [];
         this.state.files.map((value) => {
             let item = {};
-            item.w = size[index].w;
-            item.h = size[index].h;
+            item.w = value.width || 300;
+            item.h = value.height || 300;
             item.src = value.url;
             items.push(item);
         })
-        console.log(size);
         openPhotoSwipe(items, index);
     }
     render() {
@@ -118,9 +127,9 @@ export default class RegisterDetailStatic extends Component {
                         <i >返回</i>
                     </p>}
                     onLeftClick={() => hashHistory.goBack()}
-                    rightContent={[
-                        <Icon key="1" type="ellipsis" color="#fff" />,
-                    ]}
+                    // rightContent={[
+                    //     <Icon key="1" type="ellipsis" color="#fff" />,
+                    // ]}
                 >访客详细</NavBar>
                 <div className="centerWrap">
                     <div className="pubStyleList">
@@ -151,7 +160,7 @@ export default class RegisterDetailStatic extends Component {
                                     性别
                                 </div>
                                 <div className="wrapTwoPicker" style={{textAlign:"right",paddingRight:"15px"}}>
-                                    {this.state.title=="男"?"男":this.state.title=="女"?"女":""}
+                                    {this.state.title=="1"?"男":this.state.title=="2"?"女":""}
                                 </div>
                             </div>
                             <InputItem
@@ -181,9 +190,15 @@ export default class RegisterDetailStatic extends Component {
                                     来访时间
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    <input className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
-                                    <i className="fn-left hengxian">——</i>
-                                    <input className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
+                                    <input className="fn-left" placeholder="来访时间" value={this.state.dateCome} readOnly style={{textAlign:"right"}} />
+                                </div>
+                            </div>
+                            <div className="datePickerWrap">
+                                <div className="pickerLeft">
+                                    离开时间
+                                </div>
+                                <div className="wrapTwoPicker">
+                                    <input className="fn-left" placeholder="离开时间" value={this.state.dateLeave} readOnly style={{ textAlign: "right" }}/>
                                 </div>
                             </div>
                             <div className="datePickerWrap">
@@ -254,19 +269,24 @@ export default class RegisterDetailStatic extends Component {
                                 style={{ textAlign: "right" }}
                                 onChange={(value) => { this.setState({ carNum: value})}}
                             >访客车牌</InputItem>
-                            <InputItem
-                                clear
-                                editable={this.state.edit}
-                                ref={el => this.customFocusInst = el}
-                                value={this.state.identity}
-                                style={{ textAlign: "right" }}
-                                onChange={(value) => { this.setState({ identity: value }) }}
-                            >访客身份</InputItem>
+                            <div className="datePickerWrap isVip" style={{textAlign:"right"}}>
+                                <div className="pickerLeft">
+                                    访客身份
+                                </div>
+                                <div className="wrapTwoPicker">
+                                    <Flex.Item>
+                                        <Radio className="my-radio"
+                                            disabled={true}
+                                            checked={this.state.selec==1?true:false}
+                                        >是否为VIP客户</Radio>
+                                    </Flex.Item>
+                                </div>
+                            </div>
                         </List>
                         <WhiteSpace size="xs" />
                         <ImagePicker
                             files={this.state.files}
-                            onChange={this.onChange}
+                            className="imgPicStatic"
                             onImageClick={(index, fs) => { this.onTouchImg(index) }}
                             selectable={this.state.files.length < 10}
                             multiple={true}

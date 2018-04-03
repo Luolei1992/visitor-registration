@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { hashHistory } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
-import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast } from 'antd-mobile';
+import { NavBar, Icon, InputItem, List, WhiteSpace, Flex,ImagePicker, DatePicker, TextareaItem, Toast,Radio } from 'antd-mobile';
 import { Line, Jiange } from './Template'
 
 import PhotoSwipeItem from './photoSwipeElement.jsx';
@@ -29,9 +29,8 @@ let minDate = new Date(nowTimeStamp);
 let fstDate = '';
 let secDate = minDate;
 const maxDate = new Date(nowTimeStamp + 1e7);
-// console.log(minDate, maxDate);
+
 if (minDate.getDate() !== maxDate.getDate()) {
-    // set the minDate to the 0 of maxDate
     minDate = new Date(maxDate.getFullYear(), maxDate.getMonth(), maxDate.getDate());
 }
 
@@ -48,8 +47,9 @@ export default class Register extends Component {
             cardType: "身份证",
             hasError: false,
             hasError1:false,
+            selec:false,
             name: "",      //访客姓名
-            title: "男",     //性别
+            title: "1",     //性别
             phone: "",     //手机号码
             person: "",    //来访人数
             dateCome: "",  //来访时间
@@ -116,13 +116,12 @@ export default class Register extends Component {
                 identity_type:0,
                 identity_num:this.state.card,
                 purpose:this.state.reason, 
-                sex: "男",  //多出参数
-                is_vip: 0,   //多出参数
-                person_name: "", //多出参数
-                // title:this.state.title,   //缺少参数（标题）
-                // car_num: this.state.carNum,  //缺少参数(访客车牌)
-                // identity: this.state.identity, //缺少参数(访客身份)
-                // batch_path_ids:this.state.ids.join("_") //缺少参数(图片上传)
+                sex: this.state.title,
+                is_vip: this.state.selec?1:0,   
+                person_name: "", 
+                plate_num: this.state.carNum, 
+                appendix:this.state.ids.join("_"),
+                id:""
             }, this.handleSend, false, "post");
         }
     }
@@ -147,6 +146,7 @@ export default class Register extends Component {
             });
         } else {
             size.push(item);
+            let width = size[size.length - 1];
             runPromise('upload_image', {
                 "arr": files[files.length - 1].url
             }, this.handleBackPicSrc, false, "post");
@@ -227,9 +227,9 @@ export default class Register extends Component {
                         <i >返回</i>
                     </p>}
                     onLeftClick={() => hashHistory.goBack()}
-                    rightContent={[
-                        <Icon key="1" type="ellipsis" color="#fff" />,
-                    ]}
+                    // rightContent={[
+                    //     <Icon key="1" type="ellipsis" color="#fff" />,
+                    // ]}
                 >访客登记</NavBar>
                 <div className="centerWrap">
                     <p className="warring">请输入访客基本身份信息（必填项）</p>
@@ -249,26 +249,26 @@ export default class Register extends Component {
                                 <div className="wrapTwoPicker">
                                     <button 
                                         style={{
-                                            border:this.state.title=='男'?'1px solid #6EB5E7':'1px solid #ccc',
-                                            color: this.state.title == '男' ? "#6EB5E7" :"#6d6d6d",
+                                            border:this.state.title=='1'?'1px solid #6EB5E7':'1px solid #ccc',
+                                            color: this.state.title == '1' ? "#6EB5E7" :"#6d6d6d",
                                             margin:"0 10px",
                                             padding:"5px",
                                             borderRadius:"5px"
                                         }}
                                         onClick={()=>{
-                                            this.setState({title:"男"})
+                                            this.setState({title:"1"})
                                         }}
                                     >男 <i className="icon-xingbienan iconfont"></i></button>
                                     <button 
                                         style={{
-                                            border: this.state.title == '女' ? '1px solid #FF3BC4' : '1px solid #ccc',
-                                            color: this.state.title == '女' ? "#FF3BC4" : "#6d6d6d",
+                                            border: this.state.title == '2' ? '1px solid #FF3BC4' : '1px solid #ccc',
+                                            color: this.state.title == '2' ? "#FF3BC4" : "#6d6d6d",
                                             margin: "0 10px",
                                             padding:"5px",
                                             borderRadius: "5px"
                                         }}
                                         onClick={() => {
-                                            this.setState({ title: "女" })
+                                            this.setState({ title: "2" })
                                         }}
                                     >女 <i className="icon-xingbienv iconfont"></i></button>
                                 </div>
@@ -306,15 +306,21 @@ export default class Register extends Component {
                                         value={this.state.date}
                                         onChange={date => { this.getComeDatePicker(date) }}
                                     >
-                                        <input className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
+                                        <input className="fn-left ellips" placeholder="选择来访时间" value={this.state.dateCome} readOnly />
                                     </DatePicker>
-                                    <i className="fn-left hengxian">——</i>
+                                </div>
+                            </div>
+                            <div className="datePickerWrap">
+                                <div className="pickerLeft">
+                                    离开时间
+                                </div>
+                                <div className="wrapTwoPicker">
                                     <DatePicker
                                         minDate={secDate}
                                         value={this.state.date}
                                         onChange={date => { this.getLeaveDatePicker(date) }}
                                     >
-                                        <input className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
+                                        <input className="fn-left ellips" placeholder="选择离开时间" value={this.state.dateLeave} readOnly />
                                     </DatePicker>
                                 </div>
                             </div>
@@ -382,13 +388,21 @@ export default class Register extends Component {
                                 value={this.state.carNum}
                                 onChange={(value) => { this.setState({ carNum: value})}}
                             >访客车牌</InputItem>
-                            <InputItem
-                                clear
-                                editable={this.state.edit}
-                                ref={el => this.customFocusInst = el}
-                                value={this.state.identity}
-                                onChange={(value) => { this.setState({ identity: value }) }}
-                            >访客身份</InputItem>
+                            <div className="datePickerWrap isVip">
+                                <div className="pickerLeft">
+                                    访客身份
+                                </div>
+                                <div className="wrapTwoPicker">
+                                    <Flex.Item>
+                                        <Radio className="my-radio" 
+                                            checked={this.state.selec}
+                                            onChange={e => {
+                                                this.setState({selec:!this.state.selec})
+                                            }}
+                                        >是否为VIP客户</Radio>
+                                    </Flex.Item>
+                                </div>
+                            </div>
                         </List>
                         <WhiteSpace size="xs" />
                         <ImagePicker

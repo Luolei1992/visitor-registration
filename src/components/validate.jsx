@@ -107,6 +107,7 @@ const getLocationParam=(name)=> {
     }
     return "";
 };
+
 export default {
     CheckPhone, 
     CheckKeywords, 

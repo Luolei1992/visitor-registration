@@ -34,8 +34,13 @@ export default class RegisterList extends Component {
             if (res.success) {
                 realData = res.data.item_list;
                 realDataLength = res.data.item_list.length;
-                this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
-                sessionStorage.setItem("registerList", JSON.stringify(realData));
+                if (pageIndex == 0) {
+                    this.rData = [];
+                    this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
+                    sessionStorage.setItem("registerList", JSON.stringify(realData));
+                } else {
+                    this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
+                }
                 const hei = document.documentElement.clientHeight - document.querySelector(".pubStyleList").offsetTop
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(this.rData),
@@ -58,8 +63,6 @@ export default class RegisterList extends Component {
     }
     componentDidMount() {
         this.rData = this.genData();
-        console.log(this.rData);
-
         this.props.router.setRouteLeaveHook(
             this.props.route,
             this.routerWillLeave
@@ -69,12 +72,6 @@ export default class RegisterList extends Component {
         //         pathname: '/login'
         //     });
         // };
-        console.log(!validate.getLocationParam("username"));
-        if (!validate.getLocationParam("username")) {
-            hashHistory.push({
-                pathname: '/login'
-            });
-        }
         this.sendVisitMsg(0);
     }
     componentDidUpdate() {
@@ -127,7 +124,8 @@ export default class RegisterList extends Component {
                         });
                     }}>
                         <h3>
-                            {obj.visitor_name}
+                            {obj.visitor_name}&nbsp;
+                            {obj.gender == 1 ? <i className="iconfont icon-xingbienan" style={{ color: "#6EB5E7",fontSize:"18px" }}></i> : <i className="iconfont icon-xingbienv" style={{ color: "#FF3BC4", fontSize: "18px"}}></i>}
                             {
                                 obj.display == 1 ? <span style={{ color: "#F05011" }}>待审核</span> :
                                     obj.display == 2 ? <span style={{ color: "#3FD80A" }}>已通过</span> :
@@ -150,11 +148,11 @@ export default class RegisterList extends Component {
                         <i >返回</i>
                     </p>}
                     onLeftClick={() => hashHistory.goBack()}
-                    rightContent={[
-                        <Icon key="1" type="ellipsis" color="#fff" />,
-                    ]}
+                    // rightContent={[
+                    //     <Icon key="1" type="ellipsis" color="#fff" />,
+                    // ]}
                 >访客列表</NavBar>
-                <div className="centerWrap" style={{ paddingBottom: "0" }}>
+                <div className="centerWrap" style={{ paddingBottom: "0"}}>
                     <div className="pubStyleList">
                         <ListView
                             key={false}
@@ -181,6 +179,7 @@ export default class RegisterList extends Component {
                 <div className="plusRegister" onClick={() => { hashHistory.push({ pathname: "/register" }) }}>
                     <i className="iconfont icon-jia"></i>
                 </div>
+                
             </div>
         );
     }

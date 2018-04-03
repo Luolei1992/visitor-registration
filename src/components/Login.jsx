@@ -14,35 +14,43 @@ export default class Login extends React.Component {
         this.state = {
             hasError: false,
             error: false,
-            animating:false,
-            // value: '15657185156',
-            // keywords:'luolei251537',
-            value: '15657185156',
-            keywords: 'luolei251537',
-            code:"",
-            codeNum:2
+            animating:true,
+            value: '',
+            keywords: ''
         };
+        this.handleAutoSend=(res)=>{
+            if(res.success){
+                setTimeout(() => {
+                    hashHistory.push({
+                        pathname: '/registerList'
+                    });
+                    this.setState({ animating: false })
+                }, 500);
+            } else {
+                this.setState({ animating: false },()=>{Toast.info('快速登陆失败，请重新登陆！', 2, null, false)})
+            }
+        }
         this.handleSend = (res) => {
-            console.log(res)
             if(res.success) {
-                validate.setCookie('user_id',1001)
                 hashHistory.push({
-                    pathname: '/registerList',
-                    query:{username:"123"}
+                    pathname: '/registerList'
                 });
-            }else{
-                
+                this.setState({animating:false})
+            } else {
+                this.setState({ animating: false },()=>{Toast.info(res.message, 2, null, false)});
             }
         }
     }
 
     componentDidMount() {
-        if (!!validate.getCookie('user_id')) {
-            hashHistory.push({
-                pathname: '/registerList',
-                query:{username:"123"}
-            });
-        };
+        // if (!!validate.getCookie('user_id')) {
+        //     hashHistory.push({
+        //         pathname: '/registerList'
+        //     });
+        // };
+        runPromise("auto_login", {
+            username: this.props.location.query.username || ""
+        }, this.handleAutoSend, false, "post");
     }
     onErrorClick = (val) => { //验证错误回调
         if (this.state.hasError) {
@@ -54,7 +62,6 @@ export default class Login extends React.Component {
     
     onChange = (value) => {  //用户名输入
         this.setState({
-            hasError: validate.CheckPhone(value).hasError,
             value:value
         });
     }
@@ -65,13 +72,13 @@ export default class Login extends React.Component {
         })
     }
     onLogin() {       //确认登陆
+        this.setState({ animating: true })
         runPromise("login", {
             username: this.state.value,
             password: this.state.keywords
         }, this.handleSend, false, "post");
     }
     render() {
-        console.log("render")
         return (
             <QueueAnim className="topMargin" animConfig={[
                 { opacity: [1, 0], translateX: [0, 50] }
@@ -90,11 +97,8 @@ export default class Login extends React.Component {
                                     error={this.state.hasError}
                                     maxLength={11}
                                     value={this.state.value}
-                                    onErrorClick={()=>{
-                                        this.onErrorClick(validate.CheckPhone(this.state.value).errorMessage);
-                                    }}
                                     onChange={this.onChange}
-                                ><i className="phone iconfont icon-shouji1"></i></InputItem>
+                                ><i className="phone iconfont icon-ren"></i></InputItem>
 
                                 <InputItem
                                     type="password"
@@ -117,11 +121,13 @@ export default class Login extends React.Component {
                                 }}
                             >登 陆</Button>
                         </div>
-                        {/* <ActivityIndicator
+
+                        <ActivityIndicator
                             toast
                             text="登陆中..."
+                            size="large"
                             animating={this.state.animating}
-                        /> */}
+                        />
                     </div>
                 </div>
             </QueueAnim >
