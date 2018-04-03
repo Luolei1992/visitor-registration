@@ -56,7 +56,7 @@ export default class ShareRegister extends Component {
             if(res.success) {
                 this.setState({
                     add_time: this.dateResize(res.data.add_time),
-                    qr_code:res.data.qr_code || "http://www.baidu.com",
+                    qr_code:res.data.qr_code,
                     isShow: res.data.appendixs.length > 0 ? true : false,
                     name: res.data.visitor_name,
                     phone: res.data.phone,
@@ -159,7 +159,7 @@ export default class ShareRegister extends Component {
                                 <div className="pickerLeft">
                                     性别
                                 </div>
-                                <div className="wrapTwoPicker">
+                                <div className="wrapTwoPicker"  style={{color:"#000"}}>
                                     {this.state.title == "1" ? "男" : this.state.title == "2"?"女":""}
                                 </div>
                             </div>
@@ -191,7 +191,13 @@ export default class ShareRegister extends Component {
                                 </div>
                                 <div className="wrapTwoPicker">
                                     <input style={{color:"#000"}} className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
-                                    <i className="fn-left hengxian">——</i>
+                                </div>
+                            </div>
+                            <div className="datePickerWrap">
+                                <div className="pickerLeft">
+                                    来访时间
+                                </div>
+                                <div className="wrapTwoPicker">
                                     <input style={{ color: "#000" }} className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
                                 </div>
                             </div>
@@ -199,45 +205,8 @@ export default class ShareRegister extends Component {
                                 <div className="pickerLeft">
                                     证件
                                 </div>
-                                <div className="wrapTwoPicker">
-                                    <span className="fn-left cardType">
-                                        <span className="isSelect" style={{ color: this.state.isSelect ? "#000" : "#000" }}>{this.state.cardType}</span>
-                                        <div className="changeCardType" style={{ display: this.state.isCardType ? "none" : "none" }} >
-                                            <ul>
-                                                <li onClick={(e) => {
-                                                    this.setState({
-                                                        cardType: e.currentTarget.innerHTML,
-                                                        isCardType: false,
-                                                        isSelect: true
-                                                    })
-                                                }} >身份证</li>
-                                                {/* <li onClick={(e) => {
-                                                    this.setState({
-                                                        cardType: e.currentTarget.innerHTML,
-                                                        isCardType: false,
-                                                        isSelect: true
-                                                    })
-                                                }}>驾驶证</li> */}
-                                                {/* <li onClick={(e) => { this.setState({ 
-                                                    cardType: e.currentTarget.innerHTML,
-                                                    isCardType: false,
-                                                    isSelect: true
-                                                })}}>学生证</li> */}
-                                            </ul>
-                                        </div>
-                                    </span>
-                                    <span className="fn-left cardLine">|</span>
-                                    <input className="fn-left cardNum"
-                                        maxLength="18"
-                                        placeholder="证件号码"
-                                        disabled={this.state.disabled}
-                                        value={this.state.card}
-                                        style={{color:this.state.hasError1?"red":"#6d6d6d",color:"#000"}}
-                                        onChange={(e) => { 
-                                            // this.setState({ card: e.currentTarget.value.replace(/[^\w\.\/]/ig, '') }) 
-                                            this.setCardNum(e.currentTarget.value);
-                                        }}
-                                    />
+                                <div className="wrapTwoPicker" style={{color:"#000"}}>
+                                    身份证：{this.state.card}
                                 </div>
                             </div>
 
@@ -253,7 +222,7 @@ export default class ShareRegister extends Component {
 
                         {/* <span style={{ marginLeft: "15px",display:this.state.isShow?"none":"block" }}>附件：暂无</span> */}
                         {
-                            this.state.qr_code == null || this.state.qr_code == "null" || this.state.qr_code == undefined || this.state.qr_code == "undefined" || this.state.qr_code == ""?""
+                            (this.state.qr_code == null || this.state.qr_code == "null" || this.state.qr_code == undefined || this.state.qr_code == "undefined" || this.state.qr_code == "")?""
                             :<div>
                                 <div className="sharePic" style={{ background: "url(" + imgUrl + ") center center /100% 100% " }}>
                                     <img id="qrious" />

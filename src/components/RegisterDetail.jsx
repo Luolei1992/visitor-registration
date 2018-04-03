@@ -269,7 +269,8 @@ export default class RegisterDetail extends Component {
     }
     render() {
         return (
-            <div className="registerWrap" onClick={(e) => { this.whichClick(e) }}>
+            // <div className="registerWrap" onClick={(e) => { this.whichClick(e) }}>
+            <div className="registerWrap">
                 <NavBar
                     mode="dark"
                     className="pubHeadStyle"
@@ -359,16 +360,30 @@ export default class RegisterDetail extends Component {
                                         value={this.state.date}
                                         onChange={date => { this.getComeDatePicker(date) }}
                                     >
-                                        <input className="fn-left ellips" placeholder="来访" value={this.state.dateCome} readOnly />
+                                        <input className="fn-left ellips" 
+                                            placeholder="来访时间" 
+                                            value={this.state.dateCome} readOnly 
+                                            style={{textAlign:this.state.disabled?"right":"left"}}
+                                        />
                                     </DatePicker>
-                                    <i className="fn-left hengxian">——</i>
+                                </div>
+                            </div>
+                            <div className="datePickerWrap">
+                                <div className="pickerLeft">
+                                    来访时间
+                                </div>
+                                <div className="wrapTwoPicker">
                                     <DatePicker
                                         minDate={secDate}
                                         disabled={this.state.disabled}
                                         value={this.state.date}
                                         onChange={date => { this.getLeaveDatePicker(date) }}
                                     >
-                                        <input className="fn-left ellips" placeholder="离开" value={this.state.dateLeave} readOnly />
+                                        <input className="fn-left ellips" 
+                                            placeholder="离开时间" 
+                                            value={this.state.dateLeave} readOnly 
+                                            style={{textAlign:this.state.disabled?"right":"left"}}
+                                        />
                                     </DatePicker>
                                 </div>
                             </div>
@@ -376,45 +391,50 @@ export default class RegisterDetail extends Component {
                                 <div className="pickerLeft">
                                     证件
                                 </div>
-                                <div className="wrapTwoPicker">
-                                    <span className="fn-left cardType">
-                                        <span className="isSelect" style={{ color: this.state.isSelect ? "#6d6d6d" : "#E2E2E2" }}>{this.state.cardType}</span>
-                                        <div className="changeCardType" style={{ display: this.state.isCardType ? "block" : "none" }} >
-                                            <ul>
-                                                <li onClick={(e) => {
-                                                    this.setState({
-                                                        cardType: e.currentTarget.innerHTML,
-                                                        isCardType: false,
-                                                        isSelect: true
-                                                    })
-                                                }}>身份证</li>
-                                                {/* <li onClick={(e) => {
-                                                    this.setState({
-                                                        cardType: e.currentTarget.innerHTML,
-                                                        isCardType: false,
-                                                        isSelect: true
-                                                    })
-                                                }}>驾驶证</li> */}
-                                                {/* <li onClick={(e) => { this.setState({ 
-                                                    cardType: e.currentTarget.innerHTML,
-                                                    isCardType: false,
-                                                    isSelect: true
-                                                })}}>学生证</li> */}
-                                            </ul>
+                                <div className="wrapTwoPicker" style={{textAlign:this.state.disabled?"right":"left"}}>
+                                    {
+                                        this.state.disabled?<span style={{marginRight:"15px"}}>身份证：{this.state.card}</span> :
+                                        <div>
+                                            <span className="fn-left cardType">
+                                                <span className="isSelect" style={{ color: this.state.isSelect ? "#6d6d6d" : "#E2E2E2" }}>{this.state.cardType}</span>
+                                                <div className="changeCardType" style={{ display: this.state.isCardType ? "block" : "none" }} >
+                                                    <ul>
+                                                        <li onClick={(e) => {
+                                                            this.setState({
+                                                                cardType: e.currentTarget.innerHTML,
+                                                                isCardType: false,
+                                                                isSelect: true
+                                                            })
+                                                        }}>身份证</li>
+                                                        {/* <li onClick={(e) => {
+                                                            this.setState({
+                                                                cardType: e.currentTarget.innerHTML,
+                                                                isCardType: false,
+                                                                isSelect: true
+                                                            })
+                                                        }}>驾驶证</li> */}
+                                                        {/* <li onClick={(e) => { this.setState({ 
+                                                            cardType: e.currentTarget.innerHTML,
+                                                            isCardType: false,
+                                                            isSelect: true
+                                                        })}}>学生证</li> */}
+                                                    </ul>
+                                                </div>
+                                            </span>
+                                            <span className="fn-left cardLine">|</span>
+                                            <input className="fn-left cardNum"
+                                                maxLength="18"
+                                                placeholder="证件号码"
+                                                disabled={this.state.disabled}
+                                                value={this.state.card}
+                                                style={{ color: this.state.hasError1 ? "red" : "#6d6d6d" }}
+                                                onChange={(e) => {
+                                                    // this.setState({ card: e.currentTarget.value.replace(/[^\w\.\/]/ig, '') }) 
+                                                    this.setCardNum(e.currentTarget.value);
+                                                }}
+                                            />
                                         </div>
-                                    </span>
-                                    <span className="fn-left cardLine">|</span>
-                                    <input className="fn-left cardNum"
-                                        maxLength="18"
-                                        placeholder="证件号码"
-                                        disabled={this.state.disabled}
-                                        value={this.state.card}
-                                        style={{ color: this.state.hasError1 ? "red" : "#6d6d6d" }}
-                                        onChange={(e) => {
-                                            // this.setState({ card: e.currentTarget.value.replace(/[^\w\.\/]/ig, '') }) 
-                                            this.setCardNum(e.currentTarget.value);
-                                        }}
-                                    />
+                                    }
                                 </div>
                             </div>
 

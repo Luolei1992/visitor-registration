@@ -205,45 +205,8 @@ export default class RegisterDetailStatic extends Component {
                                 <div className="pickerLeft">
                                     证件
                                 </div>
-                                <div className="wrapTwoPicker">
-                                    <span className="fn-left cardType">
-                                        <span className="isSelect" style={{ color: this.state.isSelect ? "#6d6d6d" : "#E2E2E2" }}>{this.state.cardType}</span>
-                                        <div className="changeCardType" style={{ display: this.state.isCardType ? "none" : "none" }} >
-                                            <ul>
-                                                <li onClick={(e) => {
-                                                    this.setState({
-                                                        cardType: e.currentTarget.innerHTML,
-                                                        isCardType: false,
-                                                        isSelect: true
-                                                    })
-                                                }}>身份证</li>
-                                                {/* <li onClick={(e) => {
-                                                    this.setState({
-                                                        cardType: e.currentTarget.innerHTML,
-                                                        isCardType: false,
-                                                        isSelect: true
-                                                    })
-                                                }}>驾驶证</li> */}
-                                                {/* <li onClick={(e) => { this.setState({ 
-                                                    cardType: e.currentTarget.innerHTML,
-                                                    isCardType: false,
-                                                    isSelect: true
-                                                })}}>学生证</li> */}
-                                            </ul>
-                                        </div>
-                                    </span>
-                                    <span className="fn-left cardLine">|</span>
-                                    <input className="fn-left cardNum"
-                                        maxLength="18"
-                                        placeholder="证件号码"
-                                        disabled={this.state.disabled}
-                                        value={this.state.card}
-                                        style={{ color: this.state.hasError1 ? "red" : "#6d6d6d",textAlign: "right" }}
-                                        onChange={(e) => { 
-                                            // this.setState({ card: e.currentTarget.value.replace(/[^\w\.\/]/ig, '') }) 
-                                            this.setCardNum(e.currentTarget.value);
-                                        }}
-                                    />
+                                <div className="wrapTwoPicker" style={{textAlign:"right",paddingRight:"15px"}}>
+                                    身份证：{this.state.card}
                                 </div>
                             </div>
 

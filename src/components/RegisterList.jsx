@@ -75,11 +75,11 @@ export default class RegisterList extends Component {
         this.sendVisitMsg(0);
     }
     componentDidUpdate() {
-        if (this.state.useBodyScroll) {
-            document.body.style.overflow = 'auto';
-        } else {
-            document.body.style.overflow = 'hidden';
-        }
+        // if (this.state.useBodyScroll) {
+        //     document.body.style.overflow = 'auto';
+        // } else {
+        //     document.body.style.overflow = 'hidden';
+        // }
     }
     routerWillLeave(nextLocation) {  //离开页面
         pageIndex = 0;
@@ -114,27 +114,24 @@ export default class RegisterList extends Component {
                 secDate.splice(2, 1);
                 return fstDate + ' ' + secDate.join(":")
             }
+            let flg = obj.display == 2 ? "/shareRegister" : "/registerDetail";
             return (
                 <div key={rowID}>
-                    <div className="registerItem" onClick={() => {
-                        let flg = obj.display == 2 ? "/shareRegister" : "/registerDetail";
-                        hashHistory.push({
-                            pathname: flg,
-                            query: { id: obj.id },
-                        });
-                    }}>
-                        <h3>
-                            {obj.visitor_name}&nbsp;
-                            {obj.gender == 1 ? <i className="iconfont icon-xingbienan" style={{ color: "#6EB5E7",fontSize:"18px" }}></i> : <i className="iconfont icon-xingbienv" style={{ color: "#FF3BC4", fontSize: "18px"}}></i>}
-                            {
-                                obj.display == 1 ? <span style={{ color: "#F05011" }}>待审核</span> :
-                                    obj.display == 2 ? <span style={{ color: "#3FD80A" }}>已通过</span> :
-                                        obj.display == 3 ? <span style={{ color: "#FF0000" }}>{obj.refuse_code ? obj.refuse_code : 审核不通过}</span> : ''
-                            }
-                        </h3>
-                        <p className="person">来访人数：{obj.person_num}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话：{obj.phone}</p>
-                        <p className="time">{obj.start_time.indexOf('-') != -1 ? dateResize(obj.start_time) : ""} ~ {obj.end_time.indexOf('-') != -1 ? dateResize(obj.end_time) : ""}</p>
-                    </div>
+                    <Link to={{ pathname:  flg, query: { id: obj.id } }}>
+                        <div className="registerItem" >
+                            <h3>
+                                {obj.visitor_name}&nbsp;
+                                {obj.gender == 1 ? <i className="iconfont icon-xingbienan" style={{ color: "#6EB5E7",fontSize:"18px" }}></i> : <i className="iconfont icon-xingbienv" style={{ color: "#FF3BC4", fontSize: "18px"}}></i>}
+                                {
+                                    obj.display == 1 ? <span style={{ color: "#F05011" }}>待审核</span> :
+                                        obj.display == 2 ? <span style={{ color: "#3FD80A" }}>已通过</span> :
+                                            obj.display == 3 ? <span style={{ color: "#FF0000" }}>{obj.refuse_code ? obj.refuse_code : 审核不通过}</span> : ''
+                                }
+                            </h3>
+                            <p className="person">来访人数：{obj.person_num}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;联系电话：{obj.phone}</p>
+                            <p className="time">{obj.start_time.indexOf('-') != -1 ? dateResize(obj.start_time) : ""} ~ {obj.end_time.indexOf('-') != -1 ? dateResize(obj.end_time) : ""}</p>
+                        </div>
+                    </Link>
                 </div>
             );
         };
