@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { Router, Route, hashHistory, IndexRoute, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
-import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast, Flex, Radio  } from 'antd-mobile';
+import { NavBar, Icon, InputItem, List, WhiteSpace, ImagePicker, DatePicker, TextareaItem, Toast } from 'antd-mobile';
+import QRious from 'qrious'
 import { Line, Jiange } from './Template'
 
 import PhotoSwipeItem from './photoSwipeElement.jsx';
@@ -21,8 +22,9 @@ let openPhotoSwipe = function (items, index) {  //图片预览插件
     gallery.init();
 }
 
-let size = [];
-export default class RegisterDetailStatic extends Component {
+let imgUrl = require('../image/erweima.png');
+
+export default class ShareRegister extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -37,7 +39,8 @@ export default class RegisterDetailStatic extends Component {
             hasError1:false,
             disabled:true,
             isShow:false,
-            selec:false,
+            add_time:"",
+            qr_code:"",
             name: "",      //访客姓名
             title: "",     //性别
             phone: "",     //手机号码
@@ -52,7 +55,9 @@ export default class RegisterDetailStatic extends Component {
         this.handleVisitDetail = (res) => {
             if(res.success) {
                 this.setState({
-                    isShow: res.data.appendixs.length>0?true:false,
+                    add_time: this.dateResize(res.data.add_time),
+                    qr_code:res.data.qr_code,
+                    isShow: res.data.appendixs.length > 0 ? true : false,
                     name: res.data.visitor_name,
                     phone: res.data.phone,
                     person: res.data.person_num,
@@ -62,11 +67,17 @@ export default class RegisterDetailStatic extends Component {
                     card: res.data.identity_num,
                     reason: res.data.purpose,
                     title: res.data.gender,  //多出参数
-                    is_vip: 0,   //多出参数
+                    // is_vip: 0,   //多出参数
                     person_name: "", //多出参数
                     files: this.newArray(res.data.appendixs),
                     carNum: res.data.plate_num,  //缺少参数(访客车牌)
                     selec: res.data.is_vip, //缺少参数(访客身份)
+                },()=>{
+                    new QRious({
+                        element: document.getElementById('qrious'),
+                        size: 140,
+                        value: this.state.qr_code
+                    })
                 })
             }
         };
@@ -79,10 +90,10 @@ export default class RegisterDetailStatic extends Component {
     }
     newArray = (arr) => {
         let newArr = [];
-        arr.map((value)=>{
+        arr.map((value) => {
             let tmp = {};
             tmp.id = value.id;
-            tmp.url = "http://"+value.path;
+            tmp.url = "http://" + value.path;
             tmp.width = value.width;
             tmp.height = value.height;
             newArr.push(tmp);
@@ -104,20 +115,21 @@ export default class RegisterDetailStatic extends Component {
         }, this.handleVisitDetail, false, "post");
     }
 
-    onTouchImg = (index) => {   //点击图片开始预览
-        let items = [];
-        this.state.files.map((value) => {
-            let item = {};
-            item.w = value.width || 300;
-            item.h = value.height || 300;
-            item.src = value.url;
-            items.push(item);
-        })
-        openPhotoSwipe(items, index);
-    }
+    // onTouchImg = (index) => {   //点击图片开始预览
+    //     let items = [];
+    //     this.state.files.map((value) => {
+    //         let item = {};
+    //         item.w = size[index].w;
+    //         item.h = size[index].h;
+    //         item.src = value.url;
+    //         items.push(item);
+    //     })
+    //     openPhotoSwipe(items, index);
+    // }
+
     render() {
         return (
-            <div className="registerWrap">
+            <div className="registerWrap" style={{backgroundColor:"#fff"}}>
                 <NavBar
                     mode="dark"
                     className="pubHeadStyle"
@@ -130,43 +142,32 @@ export default class RegisterDetailStatic extends Component {
                     //     <Icon key="1" type="ellipsis" color="#fff" />,
                     // ]}
                 >访客详细</NavBar>
-                <div className="centerWrap">
+                <div className="centerWrap borderNone">
+                    <p style={{padding:"10px 0 5px 15px"}}>时间：{this.state.add_time.split(" ")[0]}</p>
+                    <p style={{ padding: "10px 0 10px 15px", fontSize: "17px", color:"#75CF39",letterSpacing:"1px"}}>访客申请审核通过！</p>
                     <div className="pubStyleList">
-                        <div className="registerSuccess">
-                            <div className="alignCenter">
-                                <i className="iconfont icon-icon fn-left"></i>
-                                <div className="fn-left wrap">
-                                    <p className="fst">成功提交</p>
-                                    <p>等待管理员审核!</p>
-                                </div>
-                            </div>
-                            <p className="link">
-                                <span style={{padding:"6px 0"}} onClick={() => { hashHistory.push({ pathname: '/registerList'})}}>访客列表</span> <i>|</i> 
-                                <span style={{padding:"6px 0"}} onClick={() => { hashHistory.push({ pathname: '/register' }) }}>继续添加</span>
-                            </p>
-                        </div>
                         <List>
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 ref={el => this.autoFocusInst = el}
-                                value={this.state.name} 
-                                style={{ textAlign: "right" }}
+                                value={this.state.name}
+                                style={{color:"#000"}}
                                 onChange={(value)=>{this.setState({name:value})}}
                             >访客姓名</InputItem>
                             <div className="datePickerWrap">
                                 <div className="pickerLeft">
                                     性别
                                 </div>
-                                <div className="wrapTwoPicker" style={{textAlign:"right",paddingRight:"15px"}}>
-                                    {this.state.title=="1"?"男":this.state.title=="2"?"女":""}
+                                <div className="wrapTwoPicker"  style={{color:"#000"}}>
+                                    {this.state.title == "1" ? "男" : this.state.title == "2"?"女":""}
                                 </div>
                             </div>
                             <InputItem
                                 clear
                                 editable={this.state.edit}
                                 // error={this.state.hasError}
-                                style={{ color: this.state.hasError ? "red" : "#6d6d6d",textAlign:"right"}}
+                                style={{ color: this.state.hasError ? "red" : "#6d6d6d",color: "#000" }}
                                 // onErrorClick={() => {
                                 //     this.onErrorClick(validate.CheckPhone(this.state.phone).errorMessage);
                                 // }}
@@ -180,7 +181,7 @@ export default class RegisterDetailStatic extends Component {
                                 ref={el => this.customFocusInst = el}
                                 type="number"
                                 value={this.state.person}
-                                style={{ textAlign: "right"}}
+                                style={{ color: "#000" }}
                                 onChange={(value)=>{this.setState({person:value})}}
                             >来访人数</InputItem>
 
@@ -189,71 +190,48 @@ export default class RegisterDetailStatic extends Component {
                                     来访时间
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    <input className="fn-left" placeholder="来访时间" value={this.state.dateCome} readOnly style={{textAlign:"right"}} />
+                                    <input style={{color:"#000"}} className="fn-left" placeholder="来访" value={this.state.dateCome} readOnly />
                                 </div>
                             </div>
                             <div className="datePickerWrap">
                                 <div className="pickerLeft">
-                                    离开时间
+                                    来访时间
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    <input className="fn-left" placeholder="离开时间" value={this.state.dateLeave} readOnly style={{ textAlign: "right" }}/>
+                                    <input style={{ color: "#000" }} className="fn-left" placeholder="离开" value={this.state.dateLeave} readOnly />
                                 </div>
                             </div>
                             <div className="datePickerWrap">
                                 <div className="pickerLeft">
                                     证件
                                 </div>
-                                <div className="wrapTwoPicker" style={{textAlign:"right",paddingRight:"15px"}}>
+                                <div className="wrapTwoPicker" style={{color:"#000"}}>
                                     身份证：{this.state.card}
                                 </div>
                             </div>
 
-                            <Jiange name="jianGe"></Jiange>
-                            <Line border="line"></Line>
-
-                            <TextareaItem
-                                title="来访事由"
-                                data-seed="logId"
-                                className="comeForWhat"
-                                ref={el => this.autoFocusInst = el}
-                                autoHeight
-                                editable={this.state.edit}
-                                value={this.state.reason}
-                                style={{ textAlign:"right" }}
-                                onChange={(value)=>{this.setState({reason:value})}}
-                            />
-                            <InputItem
-                                clear
-                                editable={this.state.edit}
-                                ref={el => this.customFocusInst = el}
-                                value={this.state.carNum}
-                                style={{ textAlign: "right" }}
-                                onChange={(value) => { this.setState({ carNum: value})}}
-                            >访客车牌</InputItem>
-                            <div className="datePickerWrap isVip" style={{textAlign:"right"}}>
-                                <div className="pickerLeft">
-                                    访客身份
-                                </div>
-                                <div className="wrapTwoPicker">
-                                    {
-                                        (this.state.selec == 1) ? "VIP客户" : (this.state.selec == 0) ? "非VIP客户" : ""
-                                    }
-                                </div>
-                            </div>
                         </List>
-                        <WhiteSpace size="xs" />
-                        <ImagePicker
+                        {/* <ImagePicker
                             files={this.state.files}
-                            className="imgPicStatic"
+                            onChange={this.onChange}
                             onImageClick={(index, fs) => { this.onTouchImg(index) }}
                             selectable={this.state.files.length < 10}
                             multiple={true}
                             selectable={this.state.edit}
-                        />
-                        <WhiteSpace size="xs" />
-                        <span style={{ marginLeft: "15px",display:this.state.isShow?"none":"block" }}>附件：暂无</span>
+                        /> */}
+
+                        {/* <span style={{ marginLeft: "15px",display:this.state.isShow?"none":"block" }}>附件：暂无</span> */}
+                        {
+                            (this.state.qr_code == null || this.state.qr_code == "null" || this.state.qr_code == undefined || this.state.qr_code == "undefined" || this.state.qr_code == "")?""
+                            :<div>
+                                <div className="sharePic" style={{ background: "url(" + imgUrl + ") center center /100% 100% " }}>
+                                    <img id="qrious" />
+                                </div>
+                                <p style={{ textAlign: "center", marginTop: "5px", color: "#000" }}>微信通知访客</p>
+                            </div>
+                        }
                     </div>
+                    <span style={{ position: "absolute", right: "15px", bottom: "15px", color:"#D6D6D6"}}>来自 浙商证券</span>
                 </div>
                 <PhotoSwipeItem />
             </div>

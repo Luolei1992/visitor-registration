@@ -6,7 +6,7 @@ import qs from 'qs';
 
 let Ajax = axios.create({
     baseURL: 'http://139.224.68.145:8080/',      
-    timeout: 4000,
+    timeout: 6000,
     withCredentials: true,
     crossDomain: true,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
@@ -66,9 +66,17 @@ export default function runPromise(ajaxName, param, handle, mustLogin = false, m
         return;
     }
 
+    let serializeParam = { "username": localStorage.getItem("username") };
+    
+    if (method == "post") {
+        Object.assign(serializeParam, param);
+    } else {
+        serializeParam = param;
+    }
+
     run(function* () {
         // let contents = yield ajaxName(param);
-        let contents = yield sendAjax(ajaxURLList[ajaxName], param, method);
+        let contents = yield sendAjax(ajaxURLList[ajaxName], serializeParam, method);
         handle(contents.data, handleParam);
     })
 }
@@ -99,7 +107,7 @@ function sendAjax(url, param, method) {
             }).catch(error => {
                 //全局处理网络请求错误
                 console.log(error);
-                Toast.info("网络错误，请重试！", 2, null, false);
+                Toast.info("网络错误，请保持网络通畅！", 2, null, false);
                 setTimeout(() => {
                     Toast.hide();
                 }, 1000);

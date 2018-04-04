@@ -139,10 +139,10 @@ export default class RegisterList extends Component {
                 <NavBar
                     mode="dark"
                     className="pubHeadStyle"
-                    // icon={<p>
-                    //     <Icon type="left" size="lg" color="#fff" />
-                    //     <i >返回</i>
-                    // </p>}
+                    icon={<p>
+                        <Icon type="left" size="lg" color="#fff" />
+                        <i >返回</i>
+                    </p>}
                     onLeftClick={() => hashHistory.goBack()}
                     // rightContent={[
                     //     <Icon key="1" type="ellipsis" color="#fff" />,

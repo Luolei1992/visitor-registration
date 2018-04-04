@@ -304,35 +304,32 @@ export default class RegisterDetail extends Component {
                                 <div className="pickerLeft">
                                     性别
                                 </div>
-                                {
-                                    this.state.disabled ? <div style={{width:"100%",textAlign:"right",paddingRight:"15px"}}>{this.state.title == '1' ? "男" : "女"}</div>: 
-                                    <div className="wrapTwoPicker">
-                                        <button
-                                            style={{
-                                                border: this.state.title == '1' ? '1px solid #6EB5E7' : '1px solid #ccc',
-                                                color: this.state.title == '1' ? "#6EB5E7" : "#6d6d6d",
-                                                margin: "0 15px",
-                                                padding: "5px",
-                                                borderRadius: "5px"
-                                            }}
-                                            onClick={() => {
-                                                this.state.disabled ? "" : this.setState({ title: "1" })
-                                            }}
-                                        >男 <i className="icon-xingbienan iconfont"></i></button>
-                                        <button
-                                            style={{
-                                                border: this.state.title == '2' ? '1px solid #FF3BC4' : '1px solid #ccc',
-                                                color: this.state.title == '2' ? "#FF3BC4" : "#6d6d6d",
-                                                margin: "0 15px",
-                                                padding: "5px",
-                                                borderRadius: "5px"
-                                            }}
-                                            onClick={() => {
-                                                this.state.disabled ? "" : this.setState({ title: "2" })
-                                            }}
-                                        >女 <i className="icon-xingbienv iconfont"></i></button>
-                                    </div>
-                                }
+                                <div className="wrapTwoPicker" style={{textAlign:this.state.disabled?"right":"left"}}>
+                                    <button
+                                        style={{
+                                            border: this.state.title == '1' ? '1px solid #6EB5E7' : '1px solid #ccc',
+                                            color: this.state.title == '1' ? "#6EB5E7" : "#6d6d6d",
+                                            margin: "0 15px",
+                                            padding: "5px",
+                                            borderRadius: "5px"
+                                        }}
+                                        onClick={() => {
+                                            this.state.disabled ? "" : this.setState({ title: "1" })
+                                        }}
+                                    >男 <i className="icon-xingbienan iconfont"></i></button>
+                                    <button
+                                        style={{
+                                            border: this.state.title == '2' ? '1px solid #FF3BC4' : '1px solid #ccc',
+                                            color: this.state.title == '2' ? "#FF3BC4" : "#6d6d6d",
+                                            margin: "0 15px",
+                                            padding: "5px",
+                                            borderRadius: "5px"
+                                        }}
+                                        onClick={() => {
+                                            this.state.disabled ?"":this.setState({ title: "2" })
+                                        }}
+                                    >女 <i className="icon-xingbienv iconfont"></i></button>
+                                </div>
                             </div>
                             <InputItem
                                 clear
@@ -473,18 +470,15 @@ export default class RegisterDetail extends Component {
                                     访客身份
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    {
-                                        this.state.disabled ? ((this.state.selec == 1) ? "VIP客户" : (this.state.selec == 0) ? "非VIP客户" : ""):
-                                            <Flex.Item>
-                                                <Radio className="my-radio"
-                                                    checked={this.state.selec == 1 ? true : false}
-                                                    onChange={e => {
-                                                        this.setState({ selec: !this.state.selec })
-                                                    }}
-                                                >是否为VIP客户</Radio>
-                                            </Flex.Item>
-                                    }
-                                    
+                                    <Flex.Item>
+                                        <Radio className="my-radio"
+                                            checked={this.state.selec==1?true:false}
+                                            disabled={this.state.disabled}
+                                            onChange={e => {
+                                                this.setState({ selec: !this.state.selec })
+                                            }}
+                                        >是否为VIP客户</Radio>
+                                    </Flex.Item>
                                 </div>
                             </div>
                         </List>

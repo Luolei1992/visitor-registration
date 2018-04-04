@@ -236,9 +236,12 @@ export default class RegisterDetailStatic extends Component {
                                     访客身份
                                 </div>
                                 <div className="wrapTwoPicker">
-                                    {
-                                        (this.state.selec == 1) ? "VIP客户" : (this.state.selec == 0) ? "非VIP客户" : ""
-                                    }
+                                    <Flex.Item>
+                                        <Radio className="my-radio"
+                                            disabled={true}
+                                            checked={this.state.selec==1?true:false}
+                                        >是否为VIP客户</Radio>
+                                    </Flex.Item>
                                 </div>
                             </div>
                         </List>
