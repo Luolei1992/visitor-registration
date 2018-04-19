@@ -1,33 +1,34 @@
-let Ajax = axios.create({
+var Ajax = axios.create({
     baseURL: 'http://139.224.68.145:8080/',      
     timeout: 6000,
     withCredentials: true,
     crossDomain: true,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 });
-const ajaxURLList = {
+var ajaxURLList = {
     login:"fkapi/login",                            //登陆
     auto_login:"fkapi/auto_login",                  //快速登陆
     add_visitor:"fkapi/add_visitor",                //新增访客
     get_visitor_list:"fkapi/get_visitor_list",      //获取访客列表
     get_visitor_info:"fkapi/get_visitor_info",      //获取访客详细信息
     upload_image:"fkapi/upload_image",              //上传图片
+    send_notice:"fkapi/send_notice",              //上传图片到访客
 }
 
 //定义一个基于Promise的异步任务执行器
 function run(taskDef) {
     //创建迭代器
-    let task = taskDef();
+    var task = taskDef();
 
     //开始执行任务
-    let result = task.next();
+    var result = task.next();
 
     //递归函数遍历
     (function step() {
         //如果有更多任务要做
         if (!result.done) {
             //用一个Promise来解决会简化问题
-            let promise = Promise.resolve(result.value);
+            var promise = Promise.resolve(result.value);
             promise.then(function (value) {
                 result = task.next(value);
                 step();
@@ -49,25 +50,26 @@ function run(taskDef) {
  * @param {String} method ajax请求类型，默认是post
  * @param {String} handleParam ajax执行完成后的处理函数的参数
  */
-window.runPromise = function (ajaxName, param, handle, mustLogin = false, method="post", handleParam) {
-    let serializeParam = { "username": localStorage.getItem("username") };
+window.runPromise = function (ajaxName, param, handle, mustLogin, method, handleParam) {
+    var mustLogin = mustLogin || false;
+    var method = method || "post";
+    var serializeParam = { "username": localStorage.getItem("username") };
     
     if (method == "post") {
         Object.assign(serializeParam, param);
     } else {
         serializeParam = param;
     }
-
     run(function* () {
         // let contents = yield ajaxName(param);
-        let contents = yield sendAjax(ajaxURLList[ajaxName], serializeParam, method);
+        var contents = yield sendAjax(ajaxURLList[ajaxName], serializeParam, method);
         handle(contents.data, handleParam);
     })
 }
 function params(data) {
-    let url = ''
+    var url = ''
     for (var k in data) {
-        let value = data[k] !== undefined ? data[k] : ''
+        var value = data[k] !== undefined ? data[k] : ''
         url += '&' + k + '=' + encodeURIComponent(value)
     }
     return url ? url.substring(1) : ''
@@ -76,32 +78,27 @@ function params(data) {
 function sendAjax(url, param, method) {
     return new Promise(function (resolve, reject) {
         if (method.toLowerCase() == "get") {
-            let URL = url;
+            var URL = url;
             if (param instanceof Object) {
-                for (const key in param) {
+                for (var key in param) {
                     if (param.hasOwnProperty(key)) {
-                        const element = param[key];
+                        var element = param[key];
                         URL += "/" + param[key];
                     }
                 }
             }
-            Ajax.get(URL).then(req => {
+            Ajax.get(URL).then(function(req){
                 resolve(req);
-            }).catch(error => {
+            }).catch(function(error){
                 //全局处理网络请求错误
-                console.log(error);
                 reject(error);
             });
         } else {
-            Ajax.post(url, params(param)).then(req => {
+            Ajax.post(url, params(param)).then(function(req) {
                 resolve(req);
-            }).catch(error => {
+            }).catch(function(error) {
                 //全局处理网络请求错误
-                console.log(error);
                 alert("网络错误，请保持网络通畅！");
-                setTimeout(() => {
-                    Toast.hide();
-                }, 1000);
                 reject(error);
             });
         }

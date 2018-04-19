@@ -365,9 +365,10 @@
     }
 }
 .sharePic {
-    width: 140px;
-    height: 140px;
-    margin: 30px auto 0 auto;
+    width: 160px;
+    height: 160px;
+    padding-top: 20px;
+    margin: 0px auto 0 auto;
     img{
         width: 100%;
     }
@@ -424,6 +425,21 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.shareResultDetail {
+    border: 1px solid #EAEAEA;
+    margin: 15px 5px 10px 5px;
+    padding: 0 15px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+}
+.sharePadding {
+    padding-left: 0 !important;    
+    .am-list-line {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
 
 //input组件样式更改
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
@@ -448,4 +464,9 @@ input::-ms-input-placeholder{ /*Internet Explorer*/
 
 color: #E2E2E2;
 
+}
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
+    html:not([data-scale]) #fromHTMLtestdiv .am-list-body div:not(:last-child) .am-list-line::after {
+        background-color: #fff;
+    }
 }

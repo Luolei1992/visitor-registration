@@ -66,7 +66,7 @@ export default function runPromise(ajaxName, param, handle, mustLogin = false, m
         return;
     }
 
-    let serializeParam = { "username": localStorage.getItem("username") };
+    let serializeParam = { "username": getCookie("username") };
     
     if (method == "post") {
         Object.assign(serializeParam, param);

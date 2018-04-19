@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { hashHistory, Link } from 'react-router';
 import QueueAnim from 'rc-queue-anim';
-import { NavBar, Icon, PullToRefresh, ListView } from 'antd-mobile';
+import { NavBar, Icon, PullToRefresh, ListView, Toast} from 'antd-mobile';
 import { getLocationParam } from './Template'
 
 
@@ -17,7 +17,8 @@ export default class RegisterList extends Component {
             rowHasChanged: (row1, row2) => row1 !== row2,
         });
         this.state = {
-            dataSource: dataSource.cloneWithRows(JSON.parse(sessionStorage.getItem("registerList")) ? JSON.parse(sessionStorage.getItem("registerList")) : []),
+            // dataSource: dataSource.cloneWithRows(JSON.parse(sessionStorage.getItem("registerList")) ? JSON.parse(sessionStorage.getItem("registerList")) : []),
+            dataSource: dataSource.cloneWithRows([]),
             hasMore: false,
             refreshing: false,
             isLoading: true,
@@ -36,7 +37,7 @@ export default class RegisterList extends Component {
                 if (pageIndex == 0) {
                     this.rData = [];
                     this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
-                    sessionStorage.setItem("registerList", JSON.stringify(realData));
+                    // sessionStorage.setItem("registerList", JSON.stringify(realData));
                 } else {
                     this.rData = [...this.rData, ...this.genData(pageIndex++, realDataLength, realData)];
                 }
@@ -61,6 +62,7 @@ export default class RegisterList extends Component {
         }
     }
     componentDidMount() {
+        console.log(this.props.state.registerList);
         this.rData = this.genData();
         this.props.router.setRouteLeaveHook(
             this.props.route,

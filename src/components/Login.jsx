@@ -20,7 +20,7 @@ export default class Login extends React.Component {
         };
         this.handleAutoSend=(res)=>{
             if(res.success){
-                localStorage.setItem("username", res.data.username);
+                validate.setCookie("username", res.data.username);
                 setTimeout(() => {
                     hashHistory.push({
                         pathname: '/registerList'
@@ -33,7 +33,7 @@ export default class Login extends React.Component {
         }
         this.handleSend = (res) => {
             if(res.success) {
-                localStorage.setItem("username", res.data.username);
+                validate.setCookie("username", res.data.username);
                 hashHistory.push({
                     pathname: '/registerList'
                 });
@@ -45,11 +45,6 @@ export default class Login extends React.Component {
     }
 
     componentDidMount() {
-        // if (!!validate.getCookie('user_id')) {
-        //     hashHistory.push({
-        //         pathname: '/registerList'
-        //     });
-        // };
         runPromise("auto_login", {
             username: this.props.location.query.username || ""
         }, this.handleAutoSend, false, "post");
