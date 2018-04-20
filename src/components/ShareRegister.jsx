@@ -160,6 +160,7 @@ export default class ShareRegister extends Component {
                 var base64text = canvas.toDataURL(type);
                 newCanvas.remove();
                 runPromise('send_notice', {
+                    "visitor_id": this.props.location.query.id,
                     "arr": base64text
                 }, (res) => {
                     if(res.success){
