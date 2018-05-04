@@ -169,6 +169,7 @@ export default class ShareRegister extends Component {
                         })
                     }else{
                         Toast.info(res.message, 2, null, false);
+                        this.setState({animating:false});
                     }
                 }, false, "post");
             });
@@ -313,7 +314,14 @@ export default class ShareRegister extends Component {
                         animating={this.state.animating}
                     />
                 </div>
-                <div className="registerBtm" id="downloadPng" style={{ backgroundColor:"#5683F3"}} onClick={()=>{this.setState({animating:true})}}>通知访客</div>
+                <div className="registerBtm" 
+                    id="downloadPng" 
+                    style={{ backgroundColor:"#5683F3" }} 
+                    onClick={()=>{
+                        this.setState({
+                            animating:true
+                        })
+                    }}>通知访客</div>
             </div>
         );
     }

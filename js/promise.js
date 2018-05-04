@@ -1,18 +1,18 @@
 var Ajax = axios.create({
-    baseURL: 'http://139.224.68.145:8080/',      
+    baseURL: 'http://139.224.68.145:8080/',
     timeout: 6000,
     withCredentials: true,
     crossDomain: true,
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
 });
 var ajaxURLList = {
-    login:"fkapi/login",                            //登陆
-    auto_login:"fkapi/auto_login",                  //快速登陆
-    add_visitor:"fkapi/add_visitor",                //新增访客
-    get_visitor_list:"fkapi/get_visitor_list",      //获取访客列表
-    get_visitor_info:"fkapi/get_visitor_info",      //获取访客详细信息
-    upload_image:"fkapi/upload_image",              //上传图片
-    send_notice:"fkapi/send_notice",              //上传图片到访客
+    login: "fkapi/login",                            //登陆
+    auto_login: "fkapi/auto_login",                  //快速登陆
+    add_visitor: "fkapi/add_visitor",                //新增访客
+    get_visitor_list: "fkapi/get_visitor_list",      //获取访客列表
+    get_visitor_info: "fkapi/get_visitor_info",      //获取访客详细信息
+    upload_image: "fkapi/upload_image",              //上传图片
+    send_notice: "fkapi/send_notice",              //上传图片到访客
 }
 
 //定义一个基于Promise的异步任务执行器
@@ -53,18 +53,17 @@ function run(taskDef) {
 window.runPromise = function (ajaxName, param, handle, mustLogin, method, handleParam) {
     var mustLogin = mustLogin || false;
     var method = method || "post";
-    var serializeParam = { "username": localStorage.getItem("username") };
-    
+    var serializeParam = { "username": getCookie("username") };
+
     if (method == "post") {
         Object.assign(serializeParam, param);
     } else {
         serializeParam = param;
     }
-    run(function* () {
-        // let contents = yield ajaxName(param);
-        var contents = yield sendAjax(ajaxURLList[ajaxName], serializeParam, method);
-        handle(contents.data, handleParam);
-    })
+    var contents = sendAjax(ajaxURLList[ajaxName], serializeParam, method, handle, handleParam);
+
+    // handle(contents.data, handleParam);
+
 }
 function params(data) {
     var url = ''
@@ -75,7 +74,7 @@ function params(data) {
     return url ? url.substring(1) : ''
 }
 //发送ajax请求通用
-function sendAjax(url, param, method) {
+function sendAjax(url, param, method, handle, handleParam) {
     return new Promise(function (resolve, reject) {
         if (method.toLowerCase() == "get") {
             var URL = url;
@@ -87,16 +86,18 @@ function sendAjax(url, param, method) {
                     }
                 }
             }
-            Ajax.get(URL).then(function(req){
-                resolve(req);
-            }).catch(function(error){
+            Ajax.get(URL).then(function (req) {
+                // resolve(req);
+                handle(req.data, handleParam);
+            }).catch(function (error) {
                 //全局处理网络请求错误
                 reject(error);
             });
         } else {
-            Ajax.post(url, params(param)).then(function(req) {
-                resolve(req);
-            }).catch(function(error) {
+            Ajax.post(url, params(param)).then(function (req) {
+                // resolve(req);
+                handle(req.data, handleParam);
+            }).catch(function (error) {
                 //全局处理网络请求错误
                 alert("网络错误，请保持网络通畅！");
                 reject(error);
@@ -104,3 +105,11 @@ function sendAjax(url, param, method) {
         }
     });
 }
+function getCookie(name) {
+    var arr = document.cookie.match(new RegExp("(^| )" + name + "=([^;]*)(;|$)"));
+    if (arr != null) {
+        return decodeURIComponent(arr[2]);
+    } else {
+        return null;
+    }
+};
